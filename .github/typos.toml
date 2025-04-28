@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+# SPDX-License-Identifier: MIT
+
+[files]
+extend-exclude = [
+  'liquibase/2024/035-swarm-unique.xml',
+  'liquibase/2025/053-more-indexes.xml'
+]
+
+[default.extend-words]
+WRONLY = "WRONLY"

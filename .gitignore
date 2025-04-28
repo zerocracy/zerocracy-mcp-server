@@ -1,0 +1,14 @@
+*.gem
+.DS_Store
+.bundle/
+.idea/
+.yardoc/
+coverage/
+doc/
+node_modules/
+package-lock.json
+package.json
+rdoc/
+target/
+vendor/
+config.yml
