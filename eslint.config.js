@@ -1,23 +1,23 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-const { configs } = require('@eslint/js');
+import js from '@eslint/js';
+const { configs } = js;
 
-module.exports = [
+export default [
   {
     ...configs.all,
-    files: ['**.js', '**.ts'],
+    files: ['**/*.js', '**/*.ts'],
     ignores: ['dist/', 'node_modules/'],
     languageOptions: {
-      ecmaVersion: 2019,
+      ecmaVersion: 2022,
       sourceType: 'module'
     },
     rules: {
       ...configs.all.rules,
-      'capitalized-comments': 'off',
-      'no-magic-numbers': 'off',
       'indent': ['error', 2],
-      'max-len': ['error', { code: 100 }]
+      'max-len': ['error', { code: 100 }],
+      'no-magic-numbers': 'off'
     }
   }
 ];

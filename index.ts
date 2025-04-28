@@ -3,36 +3,37 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const server = new McpServer({
-  name: "Zerocracy",
-  version: "0.0.0"
-});
+const server = new McpServer(
+  {
+    capabilities: {
+      tools: {}
+    },
+    name: 'zerocracy-mcp-server',
+    version: '0.0.0'
+  },
+);
 
 server.tool(
-  "add",
-  { a: z.number(), b: z.number() },
-  async ({ a, b }) => ({
+  'give_an_advice',
+  `
+  Analyze the current situation in product development and provide
+  insights into existing issues, identify areas for improvement,
+  and outline the necessary corrective and preventive actions.
+  The goal is to enhance team productivity, maintain focus,
+  and ensure a result-oriented approach. Recommendations provided can be
+  transformed into new GitHub issues, comments on existing issues, or pull requests.
+  `,
+  { concern: z.string(), product: z.string() },
+  ({ concern, product }) => ({
     content: [{
-      text: String(a + b),
-      type: "text"
+      text: `The development of your product ("${product}") goes well: ${concern}!`,
+      type: 'text'
     }]
   })
 );
 
-server.resource(
-  "greeting",
-  new ResourceTemplate("greeting://{name}", { list: undefined }),
-  async (uri, { name }) => ({
-    contents: [{
-      text: `Hello, ${name}!`,
-      uri: uri.href
-    }]
-  })
-);
-
-const transport = new StdioServerTransport();
-await server.connect(transport);
+await server.connect(new StdioServerTransport());
