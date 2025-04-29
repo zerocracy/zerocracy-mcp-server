@@ -30,8 +30,7 @@ The token you get from [Zerocracy].
 ## How to Contribute
 
 In order to test this action, just run (provided, you have
-[Node]() 18+, Npm,
-and [GNU make](https://www.gnu.org/software/make/) installed):
+[Node] 18+, [Npm], and [GNU make] installed):
 
 ```bash
 npm install
@@ -40,5 +39,8 @@ make
 
 If it builds after your changes, submit a pull request.
 
+[Npm]: https://www.npmjs.com/
+[Node]: https://nodejs.org/en
 [Claude Desktop]: https://claude.ai/download
 [Zerocracy]: https://www.zerocracy.com
+[GNU make]: https://www.gnu.org/software/make/
