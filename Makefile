@@ -11,14 +11,14 @@ TSS=$(shell find . -not -path './node_modules/**' -not -path './test/**' -name '
 all: test lint it tsc
 
 lint:
-	npx eslint . --config eslint.config.mjs
+	npx -y eslint . --config eslint.config.mjs
 
 test:
-	npx jest --preset ts-jest --no-color --ci
+	npx -y jest --preset ts-jest --no-color --ci
 
 it:
 	mkdir -p temp
-	npx @modelcontextprotocol/inspector \
+	npx -y @modelcontextprotocol/inspector \
 		--config fixtures/claude-desktop-config.json \
 		--server zerocracy \
 		--cli --method tools/list > temp/tools.json
@@ -28,4 +28,4 @@ it:
 	fi
 
 tsc: $(TSS)
-	npx tsc --target es2020 --module nodenext --outDir dist $(TSS)
+	npx -y tsc --target es2020 --module nodenext --outDir dist $(TSS)
