@@ -1,11 +1,11 @@
 {
   "mcpServers": {
     "zerocracy": {
-      "args": [
-        "--token",
-        "48cfeb80-a777-4333-b39b-9f65f9bdfdaa"
-      ],
-      "command": "./index.ts"
+      "args": [],
+      "command": "./index.ts",
+      "env": {
+        "ZEROCRACY_TOKEN": "48cfeb80-ffff-ffff-ffff-9f65f9bdfdaa"
+      }
     }
   }
 }

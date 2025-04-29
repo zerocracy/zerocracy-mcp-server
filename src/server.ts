@@ -3,6 +3,7 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { baza } from './baza';
 
 export const server = new McpServer(
   {
@@ -26,10 +27,12 @@ server.tool(
   issues or pull requests.
   `,
   { concern: z.string(), product: z.string() },
-  ({ concern, product }) => ({
-    content: [{
-      text: `The development of your product ("${product}") goes well: ${concern}!`,
-      type: 'text'
-    }]
-  })
+  async ({ concern, product }) => {
+    return ({
+      content: [{
+        text: await baza('/mcp/tool', 'PUT', { product: product }, concern),
+        type: 'text'
+      }]
+    });
+  }
 );

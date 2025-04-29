@@ -13,13 +13,14 @@ Add the following to the `claude-desktop-config.json` file
 {
   "mcpServers": {
     "zerocracy": {
+      "command": "npx",
       "args": [
         "-y",
         "zerocracy/zerocracy-mcp-server",
-        "--token",
-        "48cfeb80-a777-4333-b39b-9f65f9bdfdaa"
       ],
-      "command": "npx"
+      "env": {
+        "ZEROCRACY_TOKEN": "48cfeb80-ffff-ffff-ffff-9f65f9bdfdaa"
+      }
     }
   }
 }
