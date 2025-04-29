@@ -40,6 +40,17 @@ describe('server', () => {
     await server.close();
     const answer = buffer.readMessage();
     expect(answer).not.toBeNull();
-    // expect(answer['result']['tools'].length).toBeGreaterThan(0);
+    if (answer) {
+      type ResponseType = JSONRPCMessage & {
+        result?: {
+          tools: any[]
+        }
+      };
+      const typedAnswer = answer as ResponseType;
+      expect(typedAnswer).toHaveProperty('result');
+      expect(typedAnswer.result).toHaveProperty('tools');
+      expect(Array.isArray(typedAnswer.result?.tools)).toBe(true);
+      expect(typedAnswer.result?.tools.length).toBeGreaterThan(0);
+    }
   });
 });
