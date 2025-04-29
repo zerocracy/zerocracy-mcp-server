@@ -39,7 +39,7 @@ describe('server', () => {
       }
     );
     await server.connect(new StdioServerTransport(stdin, stdout));
-    expect(buffer.readMessage()).not.toBeNull();
     await server.close();
+    expect(buffer.readMessage()).not.toBeNull();
   });
 });
