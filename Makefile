@@ -13,7 +13,7 @@ test:
 	npx jest --preset ts-jest
 
 it:
-	npx @modelcontextprotocol/inspector --cli node index.ts --method tools/list
+	npx @modelcontextprotocol/inspector --config fixtures/claude-desktop-config.json --server zerocracy --cli --method tools/list | jq empty
 
 run:
 	./index.ts

@@ -2,10 +2,13 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "module": "esnext",
-    "target": "esnext",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "strict": true,
-    "skipLibCheck": true
+    "target": "esnext"
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts"
+  ]
 }
