@@ -20,12 +20,13 @@ const server = new McpServer(
 server.tool(
   'give_an_advice',
   `
-  Analyze the current situation in product development and provide
-  insights into existing issues, identify areas for improvement,
-  and outline the necessary corrective and preventive actions.
-  The goal is to enhance team productivity, maintain focus,
-  and ensure a result-oriented approach. Recommendations provided can be
-  transformed into new GitHub issues, comments on existing issues, or pull requests.
+  Analyze the most critical concern related to product development,
+  providing clear insights into the underlying issues, identifying areas for
+  improvement, and outlining specific corrective and preventive actions. The
+  objective is to directly address and resolve this concern, helping the team
+  become more productive, focused, and result-oriented. These recommendations can
+  later be converted into new GitHub issues or added as comments to existing
+  issues or pull requests.
   `,
   { concern: z.string(), product: z.string() },
   ({ concern, product }) => ({
