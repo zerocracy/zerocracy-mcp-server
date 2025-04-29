@@ -4,7 +4,7 @@
 .PHONY: all test
 TSS=$(shell find . -not -path './node_modules/**' -not -path './test/**' -name '*.ts')
 
-all: test
+all: test lint it tsc
 
 lint:
 	npx eslint . --config eslint.config.mjs
