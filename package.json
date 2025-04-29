@@ -1,0 +1,42 @@
+{
+  "author": "Yegor Bugayenko <yegor256@gmail.com> (https://www.yegor256.com/)",
+  "bin": {
+    "index": "./index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2"
+  },
+  "description": "MCP Server for Zerocracy",
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.24.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1"
+  },
+  "engines": {
+    "node": ">6.0",
+    "npm": ">8.0"
+  },
+  "homepage": "https://github.com/zerocracy/zerocracy-mcp-server",
+  "keywords": [
+    "mcp",
+    "zerocracy",
+    "ai"
+  ],
+  "license": "MIT",
+  "main": "index",
+  "name": "zerocracy-mcp-server",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "repository": "zerocracy/zerocracy-mcp-server",
+  "version": "0.0.0"
+}
