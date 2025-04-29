@@ -21,9 +21,9 @@ describe('server', () => {
       {
         read: () => serializeMessage(
           {
-            jsonrpc: "2.0",
+            jsonrpc: '2.0',
             id: 1,
-            method: "ping",
+            method: 'tools/list',
           }
         )
       }
