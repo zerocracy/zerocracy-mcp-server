@@ -10,7 +10,7 @@ lint:
 	npx eslint . --config eslint.config.mjs
 
 test:
-	npx jest --preset ts-jest
+	npx jest --preset ts-jest --no-color --ci
 
 it:
 	npx @modelcontextprotocol/inspector --config fixtures/claude-desktop-config.json --server zerocracy --cli --method tools/list | jq empty
