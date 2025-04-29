@@ -1,23 +1,24 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-// import { Transport } from "@modelcontextprotocol/sdk/shared/transport.d.ts";
-import { server } from '../src/server.ts';
+import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { describe, expect, test } from '@jest/globals';
+import { server } from '../src/server';
 
 class FakeTransport {
   async start(): Promise<void> {}
   async close(): Promise<void> {}
   send(message: JSONRPCMessage): Promise<void> {
     return new Promise((resolve) => {
-      'hello'
+      resolve();
     });
   }
 }
 
 describe('server', () => {
-  test('returns a list of tools in JSON', () => {
-    server.connect(new FakeTransport());
-    expect(sum(1, 2)).toBe(3);
+  test('connects to transport', async () => {
+    const transport = new FakeTransport();
+    await server.connect(transport);
+    expect(server.isConnected()).toBe(true);
   });
 });

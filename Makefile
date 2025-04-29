@@ -2,14 +2,21 @@
 # SPDX-License-Identifier: MIT
 
 .PHONY: all test
+TSS=$(shell find . -not -path './node_modules/**' -not -path './test/**' -name '*.ts')
 
 all: test
 
 lint:
-	eslint
+	npx eslint . --config eslint.config.mjs
 
 test:
-	npx ts-node test/server-test.ts
+	npx jest --preset ts-jest
 
 it:
 	npx @modelcontextprotocol/inspector --cli node index.ts --method tools/list
+
+run:
+	./index.ts
+
+tsc: $(TSS)
+	npx tsc --target es2020 --module nodenext --outDir dist $(TSS)

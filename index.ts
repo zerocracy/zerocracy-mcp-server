@@ -1,9 +1,11 @@
-#! /usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { server } from './src/server.ts';
+import { server } from './src/server';
 
-await server.connect(new StdioServerTransport());
+(async () => {
+  await server.connect(new StdioServerTransport());
+})();
