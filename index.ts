@@ -5,6 +5,8 @@
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { server } from './src/server';
+import './src/tools';
+import './src/resources';
 
 (async (): Promise<void> => {
   await server.connect(new StdioServerTransport());

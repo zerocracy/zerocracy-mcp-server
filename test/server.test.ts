@@ -9,6 +9,8 @@ import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { baza } from '../src/baza';
 import { FakeTransport } from './fake-transport';
+import '../src/tools';
+import '../src/resources';
 
 const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
   const start = Date.now();

@@ -18,7 +18,7 @@ describe('baza', () => {
       process.env.ZEROCRACY_TOKEN = before;
     }
   });
-  
+
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
     delete process.env.ZEROCRACY_TOKEN;
     await expect(
