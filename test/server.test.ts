@@ -31,10 +31,9 @@ type ResponseType = JSONRPCMessage & {
 };
 
 const processOne = async (message: JSONRPCMessage): Promise<ResponseType> => {
-  const ser = serializeMessage(message);
   const stdin = new Readable({
     read(): void {
-      this.push(ser);
+      this.push(serializeMessage(message));
       this.push(null);
     }
   });
