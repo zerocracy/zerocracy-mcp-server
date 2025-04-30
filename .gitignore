@@ -5,3 +5,4 @@ target/
 vendor/
 dist/
 temp/
+coverage/
