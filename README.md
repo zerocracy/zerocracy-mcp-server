@@ -3,6 +3,7 @@
 [![DevOps By Rultor.com](https://www.rultor.com/b/zerocracy/zerocracy-mcp-server)](https://www.rultor.com/p/zerocracy/zerocracy-mcp-server)
 
 [![make](https://github.com/zerocracy/zerocracy-mcp-server/actions/workflows/make.yml/badge.svg)](https://github.com/zerocracy/zerocracy-mcp-server/actions/workflows/make.yml)
+[![codecov](https://codecov.io/gh/zerocracy/zerocracy-mcp-server/branch/master/graph/badge.svg)](https://codecov.io/gh/zerocracy/zerocracy-mcp-server)
 [![Hits-of-Code](https://hitsofcode.com/github/zerocracy/zerocracy-mcp-server)](https://hitsofcode.com/view/github/zerocracy/zerocracy-mcp-server)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/zerocracy/zerocracy-mcp-server/blob/master/LICENSE.txt)
 
