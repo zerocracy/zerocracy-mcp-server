@@ -88,8 +88,8 @@ describe('server', () => {
   });
 
   test('takes advice from baza', async (): Promise<void> => {
-    const products = await baza('/products', 'GET', {}, '');
-    const product = products.split("\n")[0];
+    const csv = await baza('/products', 'GET', {}, '');
+    const product = csv.split("\n")[0];
     const answer = await processOne({
       jsonrpc: '2.0' as const,
       id: 1,
@@ -101,6 +101,20 @@ describe('server', () => {
           concern: 'what is going on?'
         }
       },
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('content');
+    expect(Array.isArray(answer.result?.content)).toBe(true);
+    expect(answer.result?.content.length).toBeGreaterThan(0);
+    const text = answer.result?.content[0].text;
+    expect(text).not.toContain('HTTP error');
+  });
+
+  test('lists resources from baza', async (): Promise<void> => {
+    const answer = await processOne({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
     });
     expect(answer).toHaveProperty('result');
     expect(answer.result).toHaveProperty('content');
