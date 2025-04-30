@@ -23,7 +23,7 @@ of [Claude Desktop] (you can get the token from [Zerocracy]):
         "zerocracy/zerocracy-mcp-server",
       ],
       "env": {
-        "ZEROCRACY_TOKEN": "48cfeb80-ffff-ffff-ffff-9f65f9bdfdaa"
+        "ZEROCRACY_TOKEN": "<YOUR-ZEROCRACY-TOKEN>"
       }
     }
   }
