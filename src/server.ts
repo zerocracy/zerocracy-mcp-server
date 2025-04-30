@@ -16,7 +16,7 @@ export const server = new McpServer(
 );
 
 server.tool(
-  'give_an_advice',
+  'give_management_advice',
   `
   Analyze the most critical concern related to product development,
   providing clear insights into the underlying issues, identifying areas for

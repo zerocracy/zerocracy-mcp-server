@@ -12,7 +12,13 @@ describe('baza', () => {
 
   test('fetches non-existing page', async () => {
     await expect(
-      baza('this/path/does/not/exist', 'GET', {}, '')
+      baza('/this/path/does/not/exist', 'GET', {}, '')
     ).rejects.toThrow('HTTP error 404');
+  });
+
+  test('does not follow redirects', async () => {
+    await expect(
+      baza('/mcp/tool', 'PUT', {}, '')
+    ).rejects.toThrow('HTTP error 303');
   });
 });
