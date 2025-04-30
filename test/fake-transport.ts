@@ -6,7 +6,8 @@ import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 export class FakeTransport {
   async start(): Promise<void> {}
   async close(): Promise<void> {}
-  send(message: JSONRPCMessage): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  send(_message: JSONRPCMessage): Promise<void> {
     return new Promise((resolve) => {
       resolve();
     });

@@ -7,6 +7,7 @@ import { ReadBuffer, serializeMessage } from "@modelcontextprotocol/sdk/shared/s
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
+import { baza } from '../src/baza';
 import { FakeTransport } from './fake-transport';
 
 const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
@@ -24,9 +25,33 @@ const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPC
 
 type ResponseType = JSONRPCMessage & {
   result?: {
-    content: any[],
-    tools: any[]
+    content: Array<Record<string, unknown>>,
+    tools: Array<Record<string, unknown>>
   }
+};
+
+const processOne = async (message: JSONRPCMessage): Promise<ResponseType> => {
+  const ser = serializeMessage(message);
+  const stdin = new Readable({
+    read(): void {
+      this.push(ser);
+      this.push(null);
+    }
+  });
+  const buffer = new ReadBuffer();
+  const stdout = new Writable({
+    write(chunk, encoding, callback): void {
+      buffer.append(chunk);
+      callback();
+    }
+  });
+  await server.connect(new StdioServerTransport(stdin, stdout));
+  const answer = await waitForResponse(buffer, 10000);
+  await server.close();
+  if (answer == null) {
+    throw new Error('No message returned');
+  }
+  return answer as ResponseType;
 };
 
 describe('server', () => {
@@ -45,47 +70,28 @@ describe('server', () => {
     }
   });
 
-  test('connects to transport', async () => {
+  test('connects to transport', async (): Promise<void> => {
     const transport = new FakeTransport();
     await server.connect(transport);
     expect(server.isConnected()).toBe(true);
   });
 
-  test('lists all tools', async () => {
-    const serializedMessage = serializeMessage({
+  test('lists all tools', async (): Promise<void> => {
+    const answer = await processOne({
       jsonrpc: "2.0" as const,
       id: 1,
       method: 'tools/list',
     });
-    const stdin = new Readable({
-      read() {
-        this.push(serializedMessage);
-        this.push(null);
-      }
-    });
-    const buffer = new ReadBuffer();
-    const stdout = new Writable({
-      write(chunk, encoding, callback) {
-        buffer.append(chunk);
-        callback();
-      }
-    });
-    await server.connect(new StdioServerTransport(stdin, stdout));
-    const answer = await waitForResponse(buffer);
-    await server.close();
-    expect(answer).not.toBeNull();
-    if (answer) {
-      const typed = answer as ResponseType;
-      expect(typed).toHaveProperty('result');
-      expect(typed.result).toHaveProperty('tools');
-      expect(Array.isArray(typed.result?.tools)).toBe(true);
-      expect(typed.result?.tools.length).toBeGreaterThan(0);
-    }
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('tools');
+    expect(Array.isArray(answer.result?.tools)).toBe(true);
+    expect(answer.result?.tools.length).toBeGreaterThan(0);
   });
 
-  test('gives advice from baza', async () => {
-    const product = await baza('/products', 'GET', {}, '').split("\n")[0];
-    const serializedMessage = serializeMessage({
+  test('takes advice from baza', async (): Promise<void> => {
+    const products = await baza('/products', 'GET', {}, '');
+    const product = products.split("\n")[0];
+    const answer = await processOne({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'tools/call',
@@ -97,32 +103,11 @@ describe('server', () => {
         }
       },
     });
-    const stdin = new Readable({
-      read() {
-        this.push(serializedMessage);
-        this.push(null);
-      }
-    });
-    const buffer = new ReadBuffer();
-    const stdout = new Writable({
-      write(chunk, encoding, callback) {
-        buffer.append(chunk);
-        callback();
-      }
-    });
-    await server.connect(new StdioServerTransport(stdin, stdout));
-    const answer = await waitForResponse(buffer, 10000);
-    await server.close();
-    expect(answer).not.toBeNull();
-    if (answer) {
-      const typed = answer as ResponseType;
-      expect(typed).toHaveProperty('result');
-      expect(typed.result).toHaveProperty('content');
-      expect(Array.isArray(typed.result?.content)).toBe(true);
-      expect(typed.result?.content.length).toBeGreaterThan(0);
-      const text = typed.result?.content[0].text;
-      expect(text).not.toContain('HTTP error');
-      console.log(text);
-    }
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('content');
+    expect(Array.isArray(answer.result?.content)).toBe(true);
+    expect(answer.result?.content.length).toBeGreaterThan(0);
+    const text = answer.result?.content[0].text;
+    expect(text).not.toContain('HTTP error');
   });
 });

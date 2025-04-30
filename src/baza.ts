@@ -15,7 +15,7 @@ export const baza = async function(path: string, method: string,
     throw new Error("You must set ZEROCRACY_TOKEN environment variable");
   }
   headers.set('X-Zerocracy-Token', token);
-  const meta: Record<string, any> = {
+  const meta: Record<string, unknown> = {
     method: method,
     headers: headers,
     redirect: 'manual'
@@ -25,7 +25,7 @@ export const baza = async function(path: string, method: string,
   }
   const response = await fetch(uri, meta);
   if (response.status != 200) {
-    var error = `HTTP error ${response.status}`;
+    let error = `HTTP error ${response.status}`;
     const why = response.headers.get('X-Zerocracy-Failure');
     if (why) {
       error += `: ${why}`;
