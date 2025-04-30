@@ -8,10 +8,10 @@
 
 If you let Zerocracy help manage your product development,
 you may also enjoy integrating its management advice into your
-AI agent. For example, [Claude Desktop] may become smarter if you connect
-it with Zerocracy via this [MCP] server.
+AI agent. For example, [Claude Desktop] becomes smarter when connected
+to Zerocracy via this [MCP] server.
 Add the following configuration to the `claude-desktop-config.json` file
-of [Claude Desktop] (the token you can get from [Zerocracy]):
+of [Claude Desktop] (you can get the token from [Zerocracy]):
 
 ```json
 {
@@ -31,12 +31,13 @@ of [Claude Desktop] (the token you can get from [Zerocracy]):
 ```
 
 Then, restart [Claude Desktop] and ask it something along these lines:
-"How the development of my product is going forward? Give me management advice."
-If you add GitHub MCP server too, you can truly enjoy AI-driven vibe-management.
+"How is the development of my product progressing? Give me management advice."
+If you add the [GitHub MCP server] too,
+you can truly enjoy AI-driven vibe-management.
 
 ## How to Contribute
 
-In order to test this action, just run (provided, you have
+To test this project, simply run the following commands (you'll need
 [Node] 18+, [Npm], and [GNU make] installed):
 
 ```bash
@@ -44,7 +45,7 @@ npm install
 make
 ```
 
-If it builds after your changes, submit a pull request.
+If everything builds correctly after your changes, submit a pull request.
 
 [MCP]: https://modelcontextprotocol.io/
 [Npm]: https://www.npmjs.com/
@@ -52,3 +53,4 @@ If it builds after your changes, submit a pull request.
 [Claude Desktop]: https://claude.ai/download
 [Zerocracy]: https://www.zerocracy.com
 [GNU make]: https://www.gnu.org/software/make/
+[GitHub MCP server]: https://github.com/github/github-mcp-server
