@@ -30,6 +30,21 @@ type ResponseType = JSONRPCMessage & {
 };
 
 describe('server', () => {
+  const before = process.env.ZEROCRACY_TOKEN;
+
+  beforeEach(() => {
+    process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+  });
+
+  // Restore after each test
+  afterEach(() => {
+    if (before === undefined) {
+      delete process.env.ZEROCRACY_TOKEN;
+    } else {
+      process.env.ZEROCRACY_TOKEN = before;
+    }
+  });
+
   test('connects to transport', async () => {
     const transport = new FakeTransport();
     await server.connect(transport);
@@ -69,14 +84,15 @@ describe('server', () => {
   });
 
   test('gives advice from baza', async () => {
+    const product = await baza('/products', 'GET', {}, '').split("\n")[0];
     const serializedMessage = serializeMessage({
-      jsonrpc: "2.0" as const,
+      jsonrpc: '2.0' as const,
       id: 1,
       method: 'tools/call',
       params: {
         name: 'give_management_advice',
         arguments: {
-          product: 'foo',
+          product: product,
           concern: 'what is going on?'
         }
       },
@@ -105,7 +121,8 @@ describe('server', () => {
       expect(Array.isArray(typed.result?.content)).toBe(true);
       expect(typed.result?.content.length).toBeGreaterThan(0);
       const text = typed.result?.content[0].text;
-      // console.log(text);
+      expect(text).not.toContain('HTTP error');
+      console.log(text);
     }
   });
 });

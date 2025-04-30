@@ -11,9 +11,10 @@ export const baza = async function(path: string, method: string,
   const headers: HeadersInit = new Headers();
   headers.set('Content-Type', 'text/plain');
   const token = process.env.ZEROCRACY_TOKEN;
-  if (token) {
-    headers.set('X-Zerocracy-Token', token);
+  if (!token) {
+    throw new Error("You must set ZEROCRACY_TOKEN environment variable");
   }
+  headers.set('X-Zerocracy-Token', token);
   const meta: Record<string, any> = {
     method: method,
     headers: headers,

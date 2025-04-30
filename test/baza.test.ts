@@ -5,6 +5,20 @@ import { describe, expect, test } from '@jest/globals';
 import { baza } from '../src/baza';
 
 describe('baza', () => {
+  const before = process.env.ZEROCRACY_TOKEN;
+
+  beforeEach(() => {
+    process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+  });
+
+  afterEach(() => {
+    if (before === undefined) {
+      delete process.env.ZEROCRACY_TOKEN;
+    } else {
+      process.env.ZEROCRACY_TOKEN = before;
+    }
+  });
+
   test('fetches plain text', async () => {
     const body = await baza('/robots.txt', 'GET', {}, '');
     expect(body).toContain('Disallow');
