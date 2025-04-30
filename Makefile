@@ -24,6 +24,7 @@ it:
 		--cli --method tools/list > temp/tools.json
 	if ! jq empty temp/tools.json; then
 		cat temp/tools.json
+		./index.ts
 		exit 1
 	fi
 
