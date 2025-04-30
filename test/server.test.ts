@@ -9,6 +9,13 @@ import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { FakeTransport } from './fake-transport';
 
+type ResponseType = JSONRPCMessage & {
+  result?: {
+    content: any[],
+    tools: any[]
+  }
+};
+
 describe('server', () => {
   test('connects to transport', async () => {
     const transport = new FakeTransport();
@@ -41,16 +48,11 @@ describe('server', () => {
     const answer = buffer.readMessage();
     expect(answer).not.toBeNull();
     if (answer) {
-      type ResponseType = JSONRPCMessage & {
-        result?: {
-          tools: any[]
-        }
-      };
-      const typedAnswer = answer as ResponseType;
-      expect(typedAnswer).toHaveProperty('result');
-      expect(typedAnswer.result).toHaveProperty('tools');
-      expect(Array.isArray(typedAnswer.result?.tools)).toBe(true);
-      expect(typedAnswer.result?.tools.length).toBeGreaterThan(0);
+      const typed = answer as ResponseType;
+      expect(typed).toHaveProperty('result');
+      expect(typed.result).toHaveProperty('tools');
+      expect(Array.isArray(typed.result?.tools)).toBe(true);
+      expect(typed.result?.tools.length).toBeGreaterThan(0);
     }
   });
 
@@ -86,17 +88,12 @@ describe('server', () => {
     const answer = buffer.readMessage();
     expect(answer).not.toBeNull();
     if (answer) {
-      type ResponseType = JSONRPCMessage & {
-        result?: {
-          content: any[]
-        }
-      };
-      const typedAnswer = answer as ResponseType;
-      expect(typedAnswer).toHaveProperty('result');
-      expect(typedAnswer.result).toHaveProperty('content');
-      expect(Array.isArray(typedAnswer.result?.content)).toBe(true);
-      expect(typedAnswer.result?.content.length).toBeGreaterThan(0);
-      const text = typedAnswer.result?.content[0].text;
+      const typed = answer as ResponseType;
+      expect(typed).toHaveProperty('result');
+      expect(typed.result).toHaveProperty('content');
+      expect(Array.isArray(typed.result?.content)).toBe(true);
+      expect(typed.result?.content.length).toBeGreaterThan(0);
+      const text = typed.result?.content[0].text;
       // console.log(text);
     }
   });

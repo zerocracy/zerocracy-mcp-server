@@ -25,6 +25,10 @@ export const baza = async function(path: string, method: string,
   const response = await fetch(uri, meta);
   if (response.status != 200) {
     var error = `HTTP error ${response.status}`;
+    const why = response.headers.get('X-Zerocracy-Failure');
+    if (why) {
+      error += `: ${why}`;
+    }
     throw new Error(error);
   }
   return await response.text();

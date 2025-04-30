@@ -32,7 +32,7 @@ server.tool(
       content: [{
         text: await baza(
           '/mcp/tool', 'PUT',
-          { name: 'give_management_advice', product: product },
+          { name: 'advice', product: product },
           concern
         ),
         type: 'text'
