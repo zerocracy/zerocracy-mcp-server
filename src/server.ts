@@ -11,7 +11,7 @@ export const server = new McpServer(
       tools: {}
     },
     name: 'zerocracy-mcp-server',
-    version: '0.0.0'
+    version: '0.0.1'
   },
 );
 
