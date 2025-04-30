@@ -74,14 +74,14 @@ const listProducts = async (): Promise<{ resources: Resource[] }> => {
 
 // Register the product-details resource with list handler
 server.resource(
-  'product-details',
-  new ResourceTemplate('products://{name}/details', { list: listProducts }),
+  'product',
+  new ResourceTemplate('products://{name}', { list: listProducts }),
   async (uri, { name }) => ({
     contents: [{
       uri: uri.href,
       text: await baza(
         '/mcp/resource', 'PUT',
-        { name: 'product-details', product: String(name) },
+        { name: 'product', product: String(name) },
         ''
       )
     }]

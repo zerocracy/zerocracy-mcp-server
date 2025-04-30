@@ -18,6 +18,13 @@ describe('baza', () => {
       process.env.ZEROCRACY_TOKEN = before;
     }
   });
+  
+  test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
+    delete process.env.ZEROCRACY_TOKEN;
+    await expect(
+      baza('/robots.txt', 'GET', {}, '')
+    ).rejects.toThrow('You must set ZEROCRACY_TOKEN environment variable');
+  });
 
   test('fetches plain text', async () => {
     const body = await baza('/robots.txt', 'GET', {}, '');

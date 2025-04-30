@@ -27,7 +27,8 @@ type ResponseType = JSONRPCMessage & {
   result?: {
     content?: Array<Record<string, unknown>>,
     tools?: Array<Record<string, unknown>>,
-    resources?: Array<Record<string, unknown>>
+    resources?: Array<Record<string, unknown>>,
+    contents?: Array<Record<string, unknown>>
   }
 };
 
@@ -125,5 +126,30 @@ describe('server', () => {
     expect(resource).toHaveProperty('name');
     expect(resource).toHaveProperty('uri');
     expect(resource).toHaveProperty('description');
+  });
+
+  test('fetches resource details', async (): Promise<void> => {
+    const listResponse = await processOne({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const productName = listResponse.result?.resources?.[0].name;
+    expect(productName).toBeDefined();
+    const answer = await processOne({
+      jsonrpc: '2.0' as const,
+      id: 2,
+      method: 'resources/read',
+      params: {
+        uri: `products://${productName}`
+      }
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('contents');
+    expect(Array.isArray(answer.result?.contents)).toBe(true);
+    expect(answer.result?.contents?.length).toBeGreaterThan(0);
+    const content = answer.result?.contents?.[0];
+    expect(content).toHaveProperty('uri');
+    expect(content).toHaveProperty('text');
   });
 });

@@ -14,7 +14,7 @@ lint:
 	npx -y eslint . --config eslint.config.mjs
 
 test:
-	npx -y jest --preset ts-jest --no-color --ci --coverage
+	npx -y jest --config jest.config.ts --no-color --ci
 
 it:
 	mkdir -p temp
