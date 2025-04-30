@@ -30,7 +30,11 @@ server.tool(
   async ({ concern, product }) => {
     return ({
       content: [{
-        text: await baza('/mcp/tool', 'PUT', { product: product }, concern),
+        text: await baza(
+          '/mcp/tool', 'PUT',
+          { name: 'give_management_advice', product: product },
+          concern
+        ),
         type: 'text'
       }]
     });

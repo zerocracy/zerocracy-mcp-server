@@ -24,7 +24,8 @@ export const baza = async function(path: string, method: string,
   }
   const response = await fetch(uri, meta);
   if (response.status != 200) {
-    throw new Error(`HTTP error ${response.status}`);
+    var error = `HTTP error ${response.status}`;
+    throw new Error(error);
   }
   return await response.text();
 }

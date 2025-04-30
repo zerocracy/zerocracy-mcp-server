@@ -96,7 +96,7 @@ describe('server', () => {
       expect(typedAnswer.result).toHaveProperty('content');
       expect(Array.isArray(typedAnswer.result?.content)).toBe(true);
       expect(typedAnswer.result?.content.length).toBeGreaterThan(0);
-      const text = typedAnswer.result?.content[0];
+      const text = typedAnswer.result?.content[0].text;
       // console.log(text);
     }
   });
