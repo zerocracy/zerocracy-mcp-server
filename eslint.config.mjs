@@ -6,7 +6,7 @@ const [recommended] = await ts.configs.recommended;
 
 export default [
   {
-    ignores: ['dist/', 'node_modules/']
+    ignores: ['dist/', 'node_modules/', 'coverage/']
   },
   {
     ...recommended,
