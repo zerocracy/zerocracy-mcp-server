@@ -9,6 +9,19 @@ import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { FakeTransport } from './fake-transport';
 
+const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
+  const start = Date.now();
+  let message: JSONRPCMessage | null = null;
+  while (Date.now() - start < msec) {
+    message = buffer.readMessage();
+    if (message !== null) {
+      return message;
+    }
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  throw new Error('Timeout waiting for response');
+};
+
 type ResponseType = JSONRPCMessage & {
   result?: {
     content: any[],
@@ -43,9 +56,8 @@ describe('server', () => {
       }
     });
     await server.connect(new StdioServerTransport(stdin, stdout));
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const answer = await waitForResponse(buffer);
     await server.close();
-    const answer = buffer.readMessage();
     expect(answer).not.toBeNull();
     if (answer) {
       const typed = answer as ResponseType;
@@ -83,9 +95,8 @@ describe('server', () => {
       }
     });
     await server.connect(new StdioServerTransport(stdin, stdout));
-    await new Promise(resolve => setTimeout(resolve, 4000));
+    const answer = await waitForResponse(buffer, 10000);
     await server.close();
-    const answer = buffer.readMessage();
     expect(answer).not.toBeNull();
     if (answer) {
       const typed = answer as ResponseType;
