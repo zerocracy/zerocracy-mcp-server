@@ -6,8 +6,12 @@
 [![Hits-of-Code](https://hitsofcode.com/github/zerocracy/zerocracy-mcp-server)](https://hitsofcode.com/view/github/zerocracy/zerocracy-mcp-server)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/zerocracy/zerocracy-mcp-server/blob/master/LICENSE.txt)
 
-Add the following to the `claude-desktop-config.json` file
-(if you are with [Claude Desktop]):
+If you let Zerocracy help manage your product development,
+you may also enjoy integrating its management advice into your
+AI agent. For example, [Claude Desktop] may become smarter if you connect
+it with Zerocracy via this [MCP] server.
+Add the following configuration to the `claude-desktop-config.json` file
+of [Claude Desktop] (the token you can get from [Zerocracy]):
 
 ```json
 {
@@ -26,7 +30,9 @@ Add the following to the `claude-desktop-config.json` file
 }
 ```
 
-The token you get from [Zerocracy].
+Then, restart [Claude Desktop] and ask it something along these lines:
+"How the development of my product is going forward? Give me management advice."
+If you add GitHub MCP server too, you can truly enjoy AI-driven vibe-management.
 
 ## How to Contribute
 
@@ -40,6 +46,7 @@ make
 
 If it builds after your changes, submit a pull request.
 
+[MCP]: https://modelcontextprotocol.io/
 [Npm]: https://www.npmjs.com/
 [Node]: https://nodejs.org/en
 [Claude Desktop]: https://claude.ai/download
