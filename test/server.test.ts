@@ -25,8 +25,9 @@ const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPC
 
 type ResponseType = JSONRPCMessage & {
   result?: {
-    content: Array<Record<string, unknown>>,
-    tools: Array<Record<string, unknown>>
+    content?: Array<Record<string, unknown>>,
+    tools?: Array<Record<string, unknown>>,
+    resources?: Array<Record<string, unknown>>
   }
 };
 
@@ -84,7 +85,7 @@ describe('server', () => {
     expect(answer).toHaveProperty('result');
     expect(answer.result).toHaveProperty('tools');
     expect(Array.isArray(answer.result?.tools)).toBe(true);
-    expect(answer.result?.tools.length).toBeGreaterThan(0);
+    expect(answer.result?.tools?.length).toBeGreaterThan(0);
   });
 
   test('takes advice from baza', async (): Promise<void> => {
@@ -105,8 +106,8 @@ describe('server', () => {
     expect(answer).toHaveProperty('result');
     expect(answer.result).toHaveProperty('content');
     expect(Array.isArray(answer.result?.content)).toBe(true);
-    expect(answer.result?.content.length).toBeGreaterThan(0);
-    const text = answer.result?.content[0].text;
+    expect(answer.result?.content?.length).toBeGreaterThan(0);
+    const text = answer.result?.content?.[0].text;
     expect(text).not.toContain('HTTP error');
   });
 
@@ -117,10 +118,12 @@ describe('server', () => {
       method: 'resources/list'
     });
     expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('content');
-    expect(Array.isArray(answer.result?.content)).toBe(true);
-    expect(answer.result?.content.length).toBeGreaterThan(0);
-    const text = answer.result?.content[0].text;
-    expect(text).not.toContain('HTTP error');
+    expect(answer.result).toHaveProperty('resources');
+    expect(Array.isArray(answer.result?.resources)).toBe(true);
+    expect(answer.result?.resources?.length).toBeGreaterThan(0);
+    const resource = answer.result?.resources?.[0];
+    expect(resource).toHaveProperty('name');
+    expect(resource).toHaveProperty('uri');
+    expect(resource).toHaveProperty('description');
   });
 });

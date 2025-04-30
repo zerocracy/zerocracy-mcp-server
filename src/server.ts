@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { ListResourcesRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from 'zod';
 import { baza } from './baza';
 import { to_gpt } from './to_gpt';
@@ -46,7 +45,16 @@ server.tool(
   }
 );
 
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
+// Type definition for a resource
+type Resource = {
+  uri: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
+};
+
+// Define a function to list products
+const listProducts = async (): Promise<{ resources: Resource[] }> => {
   const csv = await baza('/products', 'GET', {}, '');
   const products = csv.split("\n");
   return {
@@ -62,17 +70,18 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
       mimeType: 'text/plain'
     }))
   };
-});
+};
 
+// Register the product-details resource with list handler
 server.resource(
   'product-details',
-  new ResourceTemplate('products://{name}/details', { list: undefined }),
+  new ResourceTemplate('products://{name}/details', { list: listProducts }),
   async (uri, { name }) => ({
     contents: [{
       uri: uri.href,
       text: await baza(
         '/mcp/resource', 'PUT',
-        { name: 'product-details', product: name },
+        { name: 'product-details', product: String(name) },
         ''
       )
     }]
