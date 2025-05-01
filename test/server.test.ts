@@ -1,64 +1,14 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { Readable, Writable } from "node:stream";
-import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
-import { ReadBuffer, serializeMessage } from "@modelcontextprotocol/sdk/shared/stdio.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { baza } from '../src/baza';
-import { FakeTransport } from './fake-transport';
+import { FakeTransport } from '../fakes/FakeTransport';
+import { once } from '../helpers/once';
 import '../src/tools';
 import '../src/resources';
 import '../src/prompts';
-
-const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
-  const start = Date.now();
-  let message: JSONRPCMessage | null = null;
-  while (Date.now() - start < msec) {
-    message = buffer.readMessage();
-    if (message !== null) {
-      return message;
-    }
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-  throw new Error('Timeout waiting for response');
-};
-
-type ResponseType = JSONRPCMessage & {
-  result?: {
-    content?: Array<Record<string, unknown>>,
-    tools?: Array<Record<string, unknown>>,
-    resources?: Array<Record<string, unknown>>,
-    prompts?: Array<Record<string, unknown>>,
-    messages?: Array<Record<string, unknown>>,
-    contents?: Array<Record<string, unknown>>
-  }
-};
-
-const processOne = async (message: JSONRPCMessage): Promise<ResponseType> => {
-  const stdin = new Readable({
-    read(): void {
-      this.push(serializeMessage(message));
-      this.push(null);
-    }
-  });
-  const buffer = new ReadBuffer();
-  const stdout = new Writable({
-    write(chunk, encoding, callback): void {
-      buffer.append(chunk);
-      callback();
-    }
-  });
-  await server.connect(new StdioServerTransport(stdin, stdout));
-  const answer = await waitForResponse(buffer, 10000);
-  await server.close();
-  if (answer == null) {
-    throw new Error('No message returned');
-  }
-  return answer as ResponseType;
-};
 
 describe('server', () => {
   const before = process.env.ZEROCRACY_TOKEN;
@@ -82,7 +32,7 @@ describe('server', () => {
   });
 
   test('lists all tools', async (): Promise<void> => {
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: "2.0" as const,
       id: 1,
       method: 'tools/list',
@@ -99,7 +49,7 @@ describe('server', () => {
       return;
     }
     const product = csv.split("\n")[0];
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'tools/call',
@@ -120,7 +70,7 @@ describe('server', () => {
   });
 
   test('lists resources from baza', async (): Promise<void> => {
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'resources/list'
@@ -138,7 +88,7 @@ describe('server', () => {
   });
 
   test('fetches resource details', async (): Promise<void> => {
-    const list = await processOne({
+    const list = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'resources/list'
@@ -151,7 +101,7 @@ describe('server', () => {
     expect(name).not.toBeNull();
     const rname = name as string;
     expect(rname.length).toBeGreaterThan(0);
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: '2.0' as const,
       id: 2,
       method: 'resources/read',
@@ -169,7 +119,7 @@ describe('server', () => {
   });
 
   test('lists prompts', async (): Promise<void> => {
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'prompts/list'
@@ -184,7 +134,7 @@ describe('server', () => {
   });
 
   test('reads one prompt', async (): Promise<void> => {
-    const answer = await processOne({
+    const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'prompts/get',
