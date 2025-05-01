@@ -3,7 +3,7 @@
 
 import { describe, expect, test, jest, beforeEach } from '@jest/globals';
 import { baza } from '../src/baza';
-import { once } from '../helpers/once';
+import { once } from './helpers/once';
 
 jest.mock('../src/baza');
 

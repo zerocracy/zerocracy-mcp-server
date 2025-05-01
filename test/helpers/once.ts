@@ -5,10 +5,10 @@ import { Readable, Writable } from "node:stream";
 import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { ReadBuffer, serializeMessage } from "@modelcontextprotocol/sdk/shared/stdio.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { server } from '../src/server';
-import '../src/tools';
-import '../src/resources';
-import '../src/prompts';
+import { server } from '../../src/server';
+import '../../src/tools';
+import '../../src/resources';
+import '../../src/prompts';
 
 const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
   const start = Date.now();

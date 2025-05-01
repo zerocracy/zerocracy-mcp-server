@@ -19,7 +19,7 @@ test:
 it:
 	mkdir -p temp
 	npx -y @modelcontextprotocol/inspector \
-		--config fixtures/claude-desktop-config.json \
+		--config test/fixtures/claude-desktop-config.json \
 		--server zerocracy \
 		--cli --method tools/list > temp/tools.json
 	if ! jq empty temp/tools.json; then

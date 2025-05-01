@@ -4,8 +4,8 @@
 import { describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { baza } from '../src/baza';
-import { FakeTransport } from '../fakes/FakeTransport';
-import { once } from '../helpers/once';
+import { FakeTransport } from './fakes/FakeTransport';
+import { once } from './helpers/once';
 import '../src/tools';
 import '../src/resources';
 import '../src/prompts';
