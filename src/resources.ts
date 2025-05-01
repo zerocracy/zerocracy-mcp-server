@@ -15,9 +15,10 @@ export type Resource = {
 
 const listProducts = async (): Promise<{ resources: Resource[] }> => {
   const csv = await baza('/products', 'GET', {}, '');
-  const products = csv.split("\n");
-  return {
-    resources: products.map((product) => ({
+  let list: Array<Resource> = [];
+  if (csv.length !== 0) {
+    const products = csv.split("\n");
+    list = products.map((product) => ({
       uri: `products://${product}`,
       name: product,
       description: to_gpt(
@@ -27,8 +28,9 @@ const listProducts = async (): Promise<{ resources: Resource[] }> => {
         `
       ),
       mimeType: 'text/plain'
-    }))
-  };
+    }));
+  }
+  return { resources: list };
 };
 
 server.resource(
