@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-// import fetch, { Headers } from 'node-fetch';
-
 export const baza = async function(path: string, method: string,
   params: Record<string, string>, body: string): Promise<string> {
   const base = 'https://www.zerocracy.com';
