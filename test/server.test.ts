@@ -67,7 +67,6 @@ describe('server', () => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
   });
 
-  // Restore after each test
   afterEach(() => {
     if (before === undefined) {
       delete process.env.ZEROCRACY_TOKEN;
