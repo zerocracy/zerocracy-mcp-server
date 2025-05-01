@@ -6,6 +6,6 @@ import { to_gpt } from '../src/to_gpt';
 
 describe('to_gpt', () => {
   test('compresses plain text', async () => {
-    expect(to_gpt('  How\n are \n\n you   ?  ')).toEqual('How are you?');
+    expect(to_gpt('  How\n \t are \n\n you   ?  ')).toEqual('How are you?');
   });
 });
