@@ -33,7 +33,7 @@ describe('baza', () => {
 
   test('fetches non-existing page', async () => {
     await expect(
-      baza('/this/path/does/not/exist', 'GET', {}, '')
+      baza('/this/path/does/not/exist', 'POST', {}, 'boom')
     ).rejects.toThrow('HTTP error 404');
   });
 
