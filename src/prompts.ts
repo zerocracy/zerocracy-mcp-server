@@ -21,7 +21,7 @@ server.prompt(
           I want one concrete action—no fluff, no vague suggestions.
           Should we overhaul the roadmap, tighten CI/CD,
             enforce stricter code reviews, raise rewards, or ramp up consequences?
-          Give me one specific, high-impact recommendation in a short, 
+          Give me one specific, high-impact recommendation in a short,
           straight-to-the-point paragraph.
           `
         )
