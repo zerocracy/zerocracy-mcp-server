@@ -6,3 +6,4 @@ vendor/
 dist/
 temp/
 coverage/
+.vscode/
