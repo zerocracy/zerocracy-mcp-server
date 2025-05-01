@@ -16,8 +16,8 @@ export type Resource = {
 server.resource(
   'product',
   new ResourceTemplate(
-    'products://{name}', 
-    { 
+    'products://{name}',
+    {
       list: async (): Promise<{ resources: Resource[] }> => {
         const csv = await baza('/products', 'GET', {}, '');
         let list: Array<Resource> = [];
