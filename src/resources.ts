@@ -13,29 +13,32 @@ export type Resource = {
   mimeType?: string;
 };
 
-const listProducts = async (): Promise<{ resources: Resource[] }> => {
-  const csv = await baza('/products', 'GET', {}, '');
-  let list: Array<Resource> = [];
-  if (csv.length !== 0) {
-    const products = csv.split("\n");
-    list = products.map((product) => ({
-      uri: `products://${product}`,
-      name: product,
-      description: to_gpt(
-        `
-        A software product named \"${product}\" is being developed by
-        a team of programmers under the supervision of Zerocracy.
-        `
-      ),
-      mimeType: 'text/plain'
-    }));
-  }
-  return { resources: list };
-};
-
 server.resource(
   'product',
-  new ResourceTemplate('products://{name}', { list: listProducts }),
+  new ResourceTemplate(
+    'products://{name}', 
+    { 
+      list: async (): Promise<{ resources: Resource[] }> => {
+        const csv = await baza('/products', 'GET', {}, '');
+        let list: Array<Resource> = [];
+        if (csv.length !== 0) {
+          const products = csv.split("\n");
+          list = products.map((product) => ({
+            uri: `products://${product}`,
+            name: product,
+            description: to_gpt(
+              `
+              A software product named \"${product}\" is being developed by
+              a team of programmers under the supervision of Zerocracy.
+              `
+            ),
+            mimeType: 'text/plain'
+          }));
+        }
+        return { resources: list };
+      }
+    }
+  ),
   async (uri, { name }) => ({
     contents: [{
       uri: uri.href,
