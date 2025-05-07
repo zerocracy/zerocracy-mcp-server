@@ -1,9 +1,9 @@
 .DS_Store
 .idea/
+.vscode/
+coverage/
+dist/
 node_modules/
 target/
-vendor/
-dist/
 temp/
-coverage/
-.vscode/
+vendor/
