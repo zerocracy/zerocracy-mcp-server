@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/zerocracy-zerocracy-mcp-server-badge.png)](https://mseep.ai/app/zerocracy-zerocracy-mcp-server)
+
 # MCP Server for Zerocracy
 
 [![DevOps By Rultor.com](https://www.rultor.com/b/zerocracy/zerocracy-mcp-server)](https://www.rultor.com/p/zerocracy/zerocracy-mcp-server)
