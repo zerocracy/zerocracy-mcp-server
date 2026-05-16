@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test, jest } from '@jest/globals';
 import { baza } from '../src/baza';
 
 describe('baza', () => {
   const before = process.env.ZEROCRACY_TOKEN;
+  const before_fetch = globalThis.fetch;
 
   beforeEach(() => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
@@ -17,6 +18,7 @@ describe('baza', () => {
     } else {
       process.env.ZEROCRACY_TOKEN = before;
     }
+    globalThis.fetch = before_fetch;
   });
 
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
@@ -41,5 +43,18 @@ describe('baza', () => {
     await expect(
       baza('/mcp/tool', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
+  });
+
+  test('wraps network failures', async () => {
+    const cause = new TypeError('fetch failed');
+    globalThis.fetch = jest.fn(async () => {
+      throw cause;
+    }) as unknown as typeof fetch;
+    await expect(
+      baza('/products', 'GET', {}, '')
+    ).rejects.toMatchObject({
+      message: 'Network failure for GET https://www.zerocracy.com/products?: fetch failed',
+      cause
+    });
   });
 });
