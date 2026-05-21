@@ -21,7 +21,17 @@ export const baza = async function(path: string, method: string,
   if (body.length > 0) {
     meta['body'] = body;
   }
-  const response = await fetch(uri, meta);
+  let response: Response;
+  try {
+    response = await fetch(uri, meta);
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    const failure = new Error(
+      `Network failure for ${method} ${uri}: ${reason}`
+    );
+    Object.defineProperty(failure, 'cause', { value: error });
+    throw failure;
+  }
   if (response.status != 200) {
     let error = `HTTP error ${response.status}`;
     const why = response.headers.get('X-Zerocracy-Failure');

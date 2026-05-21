@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { baza } from '../src/baza';
 
 describe('baza', () => {
@@ -35,6 +35,24 @@ describe('baza', () => {
     await expect(
       baza('/this/path/does/not/exist', 'POST', {}, 'boom')
     ).rejects.toThrow('HTTP error 404');
+  });
+
+  test('wraps network failures', async (): Promise<void> => {
+    const failure = new TypeError('fetch failed');
+    const fetch = jest.spyOn(globalThis, 'fetch').mockRejectedValue(failure);
+    let thrown: unknown;
+    try {
+      await baza('/robots.txt', 'GET', {}, '');
+    } catch (error: unknown) {
+      thrown = error;
+    } finally {
+      fetch.mockRestore();
+    }
+    expect(thrown).toBeInstanceOf(Error);
+    expect((thrown as Error).message).toBe(
+      'Network failure for GET https://www.zerocracy.com/robots.txt?: fetch failed'
+    );
+    expect(Object.getOwnPropertyDescriptor(thrown, 'cause')?.value).toBe(failure);
   });
 
   test('does not follow redirects', async () => {
