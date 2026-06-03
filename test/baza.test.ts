@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { baza } from '../src/baza';
 import { FakeBaza } from './fakes/FakeBaza';
 
@@ -45,5 +45,18 @@ describe('baza', () => {
     await expect(
       baza('/redirect', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
+  });
+
+  test('wraps network failures in typed Error', async () => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock.mockRejectedValue(new TypeError('fetch failed'));
+    try {
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(Error);
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(
+        'Network failure for GET'
+      );
+    } finally {
+      mock.mockRestore();
+    }
   });
 });
