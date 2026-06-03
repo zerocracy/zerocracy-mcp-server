@@ -11,4 +11,7 @@ import './src/prompts';
 
 (async (): Promise<void> => {
   await server.connect(new StdioServerTransport());
-})();
+})().catch((err) => {
+  console.error('Failed to start MCP server:', err);
+  process.exit(1);
+});
