@@ -17,7 +17,10 @@ describe('server', () => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (server.isConnected()) {
+      await server.close();
+    }
     if (before === undefined) {
       delete process.env.ZEROCRACY_TOKEN;
     } else {

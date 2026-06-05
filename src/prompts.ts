@@ -5,9 +5,10 @@ import { z } from 'zod';
 import { to_gpt } from './to_gpt';
 import { server } from './server';
 
-server.prompt(
+// @ts-ignore Zod v3/v4 type compat with SDK v1.29
+server.registerPrompt(
   'investigate-productivity-bottlenecks',
-  { product: z.string() },
+  { argsSchema: { product: z.string() } },
   ({ product }) => ({
     messages: [{
       role: 'user',

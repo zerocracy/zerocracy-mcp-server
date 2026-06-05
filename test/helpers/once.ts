@@ -48,6 +48,9 @@ export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
       callback();
     }
   });
+  if (server.isConnected()) {
+    await server.close();
+  }
   await server.connect(new StdioServerTransport(stdin, stdout));
   const answer = await waitForResponse(buffer, 10000);
   await server.close();
