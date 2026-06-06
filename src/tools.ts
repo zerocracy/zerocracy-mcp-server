@@ -6,6 +6,7 @@ import { baza } from './baza';
 import { to_gpt } from './to_gpt';
 import { server } from './server';
 
+// @ts-expect-error — TS2589: @modelcontextprotocol/sdk type depth limit
 server.tool(
   'give_management_advice',
   to_gpt(
