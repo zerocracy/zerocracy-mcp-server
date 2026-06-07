@@ -29,4 +29,4 @@ it:
 	fi
 
 tsc: $(TSS)
-	npx -y tsc --target es2020 --module nodenext --outDir dist $(TSS)
+	npx -y tsc --target es2020 --module nodenext --skipLibCheck --outDir dist $(TSS)
