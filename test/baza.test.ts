@@ -1,25 +1,29 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from '@jest/globals';
 import { baza } from '../src/baza';
+import { FakeBaza } from './fakes/FakeBaza';
 
 describe('baza', () => {
-  const before = process.env.ZEROCRACY_TOKEN;
+  const fake = new FakeBaza();
+  let host = '';
+
+  beforeAll(async (): Promise<void> => {
+    host = await fake.start();
+  });
+
+  afterAll(async (): Promise<void> => {
+    await fake.close();
+  });
 
   beforeEach(() => {
+    process.env.ZEROCRACY_HOST = host;
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
   });
 
-  afterEach(() => {
-    if (before === undefined) {
-      delete process.env.ZEROCRACY_TOKEN;
-    } else {
-      process.env.ZEROCRACY_TOKEN = before;
-    }
-  });
-
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
+    delete process.env.ZEROCRACY_HOST;
     delete process.env.ZEROCRACY_TOKEN;
     await expect(
       baza('/robots.txt', 'GET', {}, '')
@@ -39,7 +43,7 @@ describe('baza', () => {
 
   test('does not follow redirects', async () => {
     await expect(
-      baza('/mcp/tool', 'PUT', {}, '')
+      baza('/redirect', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
   });
 });

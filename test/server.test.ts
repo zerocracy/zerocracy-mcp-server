@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from '@jest/globals';
 import { server } from '../src/server';
 import { baza } from '../src/baza';
 import { FakeTransport } from './fakes/FakeTransport';
+import { FakeBaza } from './fakes/FakeBaza';
 import { once } from './helpers/once';
 import '../src/tools';
 import '../src/resources';
@@ -12,6 +13,16 @@ import '../src/prompts';
 
 describe('server', () => {
   const before = process.env.ZEROCRACY_TOKEN;
+  const fake = new FakeBaza();
+
+  beforeAll(async (): Promise<void> => {
+    process.env.ZEROCRACY_HOST = await fake.start();
+  });
+
+  afterAll(async (): Promise<void> => {
+    delete process.env.ZEROCRACY_HOST;
+    await fake.close();
+  });
 
   beforeEach(() => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
