@@ -6,7 +6,6 @@ import { baza } from './baza';
 import { to_gpt } from './to_gpt';
 import { server } from './server';
 
-// @ts-expect-error — TS2589: @modelcontextprotocol/sdk type depth limit
 server.tool(
   'give_management_advice',
   to_gpt(
@@ -21,7 +20,8 @@ server.tool(
     `
   ),
   { concern: z.string(), product: z.string() },
-  async ({ concern, product }) => {
+  // @ts-ignore — TS2589: @modelcontextprotocol/sdk type depth limit in ts-jest
+  async ({ concern, product }: { concern: string; product: string }) => {
     return ({
       content: [{
         text: await baza(

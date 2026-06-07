@@ -5,11 +5,11 @@ import { z } from 'zod';
 import { to_gpt } from './to_gpt';
 import { server } from './server';
 
-// @ts-expect-error — TS2589: @modelcontextprotocol/sdk type depth limit
-server.registerPrompt(
+server.prompt(
   'investigate-productivity-bottlenecks',
-  { argsSchema: { product: z.string() } },
-  ({ product }) => ({
+  { product: z.string() },
+  // @ts-ignore — TS2589: @modelcontextprotocol/sdk type depth limit
+  ({ product }: { product: string }) => ({
     messages: [{
       role: 'user',
       content: {
