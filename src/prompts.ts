@@ -5,9 +5,10 @@ import { z } from 'zod';
 import { to_gpt } from './to_gpt';
 import { server } from './server';
 
-server.prompt(
+// @ts-expect-error — TS2589: @modelcontextprotocol/sdk type depth limit
+server.registerPrompt(
   'investigate-productivity-bottlenecks',
-  { product: z.string() },
+  { argsSchema: { product: z.string() } },
   ({ product }) => ({
     messages: [{
       role: 'user',
@@ -22,7 +23,7 @@ server.prompt(
           Should we overhaul the roadmap, tighten CI/CD,
             enforce stricter code reviews, raise rewards, or ramp up consequences?
           Give me one specific, high-impact recommendation in a short,
-          straight-to-the-point paragraph.
+            straight-to-the-point paragraph.
           `
         )
       }
