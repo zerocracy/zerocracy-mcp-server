@@ -43,6 +43,7 @@ describe('server', () => {
     const transport = new FakeTransport();
     await server.connect(transport);
     expect(server.isConnected()).toBe(true);
+    await server.close();
   });
 
   test('lists all tools', async (): Promise<void> => {
