@@ -1,7 +1,7 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 # SPDX-License-Identifier: MIT
 
-.PHONY: all test lint it tsc
+.PHONY: all test lint it tsc clean
 .ONESHELL:
 .SHELLFLAGS := -e -o pipefail -c
 .SECONDARY:
@@ -18,15 +18,8 @@ test:
 
 it:
 	mkdir -p temp
-	npx -y @modelcontextprotocol/inspector \
-		--config test/fixtures/claude-desktop-config.json \
-		--server zerocracy \
-		--cli --method tools/list > temp/tools.json
-	if ! jq empty temp/tools.json; then
-		cat temp/tools.json
-		./index.ts
-		exit 1
-	fi
+	npx -y @modelcontextprotocol/inspector --config test/fixtures/claude-desktop-config.json --server zerocracy --cli --method tools/list > temp/tools.json
+	jq empty temp/tools.json || (cat temp/tools.json; ./index.ts; exit 1)
 
 tsc: $(TSS)
 	npx -y tsc --target es2020 --module nodenext --skipLibCheck --outDir dist $(TSS)
