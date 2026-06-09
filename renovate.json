@@ -14,7 +14,7 @@
       "automerge": true
     },
     {
-      "matchPackagePrefixes": ["@typescript-eslint/"],
+      "matchPackageNames": ["@typescript-eslint/{/,}**"],
       "groupName": "typescript-eslint packages",
       "automerge": false
     }
