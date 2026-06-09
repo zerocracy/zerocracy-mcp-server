@@ -20,7 +20,8 @@ server.tool(
     `
   ),
   { concern: z.string(), product: z.string() },
-  async ({ concern, product }) => {
+  // @ts-ignore — TS2589: @modelcontextprotocol/sdk type depth limit in ts-jest
+  async ({ concern, product }: { concern: string; product: string }) => {
     return ({
       content: [{
         text: await baza(

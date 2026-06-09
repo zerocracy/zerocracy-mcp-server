@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-License-Identifier: MIT
 {
   "compilerOptions": {
     "esModuleInterop": true,
@@ -9,6 +11,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts"
+    "test/**/*.ts"
   ]
 }

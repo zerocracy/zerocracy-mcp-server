@@ -5,11 +5,13 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export const server = new McpServer(
   {
-    capabilities: {
-      resources: {},
-      tools: {}
-    },
     name: 'zerocracy-mcp-server',
     version: '0.0.0'
   },
+  {
+    capabilities: {
+      resources: {},
+      tools: {}
+    }
+  }
 );

@@ -8,7 +8,8 @@ import { server } from './server';
 server.prompt(
   'investigate-productivity-bottlenecks',
   { product: z.string() },
-  ({ product }) => ({
+  // @ts-ignore — TS2589: @modelcontextprotocol/sdk type depth limit
+  ({ product }: { product: string }) => ({
     messages: [{
       role: 'user',
       content: {
@@ -22,7 +23,7 @@ server.prompt(
           Should we overhaul the roadmap, tighten CI/CD,
             enforce stricter code reviews, raise rewards, or ramp up consequences?
           Give me one specific, high-impact recommendation in a short,
-          straight-to-the-point paragraph.
+            straight-to-the-point paragraph.
           `
         )
       }
