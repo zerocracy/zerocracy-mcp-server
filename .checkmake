@@ -1,0 +1,5 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
+# SPDX-License-Identifier: MIT
+
+maxbodylength = 10
+minphony = 1
