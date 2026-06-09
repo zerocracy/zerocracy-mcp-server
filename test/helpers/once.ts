@@ -35,6 +35,8 @@ type ResponseType = JSONRPCMessage & {
 };
 
 export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
+  await server.close();
+  (server as unknown as { server: { _transport: undefined } }).server._transport = undefined;
   const stdin = new Readable({
     read(): void {
       this.push(serializeMessage(message));
