@@ -5,11 +5,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from '@jest/g
 import { baza } from '../src/baza';
 import { FakeBaza } from './fakes/FakeBaza';
 
-const hasToken = (): boolean => {
-  const token = process.env.ZEROCRACY_TOKEN;
-  return token !== undefined && token !== '00000000-0000-0000-0000-000000000000';
-};
-
 describe('baza', () => {
   const fake = new FakeBaza();
   let host = '';
@@ -24,7 +19,7 @@ describe('baza', () => {
 
   beforeEach(() => {
     process.env.ZEROCRACY_HOST = host;
-    process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+    process.env.ZEROCRACY_TOKEN = 'test-token';
   });
 
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
@@ -36,26 +31,17 @@ describe('baza', () => {
   });
 
   test('fetches plain text', async () => {
-    if (!hasToken()) {
-      return;
-    }
     const body = await baza('/robots.txt', 'GET', {}, '');
     expect(body).toContain('Disallow');
   });
 
   test('fetches non-existing page', async () => {
-    if (!hasToken()) {
-      return;
-    }
     await expect(
       baza('/this/path/does/not/exist', 'POST', {}, 'boom')
     ).rejects.toThrow('HTTP error 404');
   });
 
   test('does not follow redirects', async () => {
-    if (!hasToken()) {
-      return;
-    }
     await expect(
       baza('/redirect', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
