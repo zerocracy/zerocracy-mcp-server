@@ -23,3 +23,6 @@ it:
 
 tsc: $(TSS)
 	npx -y tsc --target es2020 --module nodenext --skipLibCheck --outDir dist $(TSS)
+
+clean:
+	rm -rf dist temp coverage
