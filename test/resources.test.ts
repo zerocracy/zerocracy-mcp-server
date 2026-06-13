@@ -41,6 +41,27 @@ describe('resources', () => {
     expect(resource).toHaveProperty('description');
   });
 
+  test('skips empty product after trailing newline', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\nproduct2\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer.result?.resources?.map((resource) => resource.uri)).toEqual([
+      'products://product1',
+      'products://product2'
+    ]);
+  });
+
   test('fetches fake resource details', async (): Promise<void> => {
     const list = await once({
       jsonrpc: '2.0' as const,

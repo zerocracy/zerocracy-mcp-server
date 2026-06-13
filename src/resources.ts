@@ -22,7 +22,7 @@ server.resource(
         const csv = await baza('/products', 'GET', {}, '');
         let list: Array<Resource> = [];
         if (csv.length !== 0) {
-          const products = csv.split("\n");
+          const products = csv.split("\n").filter((product) => product.length > 0);
           list = products.map((product) => ({
             uri: `products://${product}`,
             name: product,
