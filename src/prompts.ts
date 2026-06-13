@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import { server } from './server';
 server.registerPrompt(
   'investigate-productivity-bottlenecks',
   { argsSchema: { product: z.string() } },
-  ({ product }) => ({
+  ({ product }: { product: string }) => ({
     messages: [{
       role: 'user',
       content: {
@@ -23,7 +23,7 @@ server.registerPrompt(
           Should we overhaul the roadmap, tighten CI/CD,
             enforce stricter code reviews, raise rewards, or ramp up consequences?
           Give me one specific, high-impact recommendation in a short,
-          straight-to-the-point paragraph.
+            straight-to-the-point paragraph.
           `
         )
       }

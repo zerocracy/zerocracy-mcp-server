@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
@@ -12,10 +12,10 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm install
       - run: make
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

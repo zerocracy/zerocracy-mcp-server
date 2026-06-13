@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { z } from 'zod';
@@ -23,7 +23,7 @@ server.registerTool(
     ),
     inputSchema: { concern: z.string(), product: z.string() }
   },
-  async ({ concern, product }) => {
+  async ({ concern, product }: { concern: string; product: string }) => {
     return ({
       content: [{
         text: await baza(
