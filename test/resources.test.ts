@@ -71,4 +71,29 @@ describe('resources', () => {
     expect(content).toHaveProperty('uri');
     expect(content).toHaveProperty('text');
   });
+
+  test('filters empty products from trailing newlines', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\nproduct2\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('resources');
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources.length).toBe(2);
+    for (const r of resources) {
+      expect(r.name.length).toBeGreaterThan(0);
+      expect(r.uri).toMatch(/^products:\/\//);
+    }
+  });
 });
