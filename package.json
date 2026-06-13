@@ -4,7 +4,8 @@
     "index": "./index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.76"
   },
   "description": "MCP Server for Zerocracy",
   "devDependencies": {
@@ -32,6 +33,11 @@
   ],
   "license": "MIT",
   "main": "./index.ts",
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^9.0.7"
+    }
+  },
   "name": "zerocracy-mcp-server",
   "os": [
     "darwin",
