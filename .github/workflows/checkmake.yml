@@ -17,4 +17,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: Uno-Takashi/checkmake-action@v2
         with:
-          config: .checkmake
+          config: .github/.checkmake
