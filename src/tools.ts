@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { z } from 'zod';
-import { baza } from './baza';
-import { to_gpt } from './to_gpt';
-import { server } from './server';
+import { baza } from './baza.js';
+import { to_gpt } from './to_gpt.js';
+import { server } from './server.js';
 
 // @ts-ignore Zod v3/v4 type compat with SDK v1.29
 server.registerTool(
@@ -23,6 +23,7 @@ server.registerTool(
     ),
     inputSchema: { concern: z.string(), product: z.string() }
   },
+  // @ts-ignore TS2589 type depth
   async ({ concern, product }: { concern: string; product: string }) => {
     return ({
       content: [{

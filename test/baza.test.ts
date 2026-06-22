@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { afterAll, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
-import { baza } from '../src/baza';
-import { FakeBaza } from './fakes/FakeBaza';
+import { baza } from '../src/baza.js';
+import { FakeBaza } from './fakes/FakeBaza.js';
 
 describe('baza', () => {
   const fake = new FakeBaza();

@@ -1,17 +1,25 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { afterAll, beforeAll, describe, expect, test, jest, beforeEach } from '@jest/globals';
-import { server } from '../src/server';
-import { baza } from '../src/baza';
-import { FakeTransport } from './fakes/FakeTransport';
-import { FakeBaza } from './fakes/FakeBaza';
-import { once } from './helpers/once';
-import '../src/tools';
-import '../src/resources';
-import '../src/prompts';
+import { afterAll, beforeAll, describe, expect, jest, test, beforeEach } from '@jest/globals';
 
-jest.mock('../src/baza');
+type Baza = (
+  path: string, method: string,
+  params: Record<string, string>, body: string
+) => Promise<string>;
+const mock = jest.fn<Baza>();
+
+jest.unstable_mockModule('../src/baza.js', () => ({
+  baza: mock,
+}));
+
+const { FakeTransport } = await import('./fakes/FakeTransport.js');
+const { FakeBaza } = await import('./fakes/FakeBaza.js');
+const { server } = await import('../src/server.js');
+const { once } = await import('./helpers/once.js');
+await import('../src/tools.js');
+await import('../src/resources.js');
+await import('../src/prompts.js');
 
 describe('server', () => {
   const before = process.env.ZEROCRACY_TOKEN;
@@ -26,10 +34,9 @@ describe('server', () => {
     await fake.close();
   });
 
-  const mock = jest.mocked(baza);
-
   beforeEach(() => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+    jest.resetAllMocks();
     mock.mockImplementation(async (path, method, params) => {
       if (path === '/products' && method === 'GET') {
         return 'product1\nproduct2\nproduct3';
@@ -64,7 +71,7 @@ describe('server', () => {
 
   test('lists all tools', async (): Promise<void> => {
     const answer = await once({
-      jsonrpc: "2.0" as const,
+      jsonrpc: '2.0' as const,
       id: 1,
       method: 'tools/list',
     });
@@ -75,8 +82,8 @@ describe('server', () => {
   });
 
   test('takes advice from baza', async (): Promise<void> => {
-    const csv = await baza('/products', 'GET', {}, '');
-    const product = csv.split("\n")[0];
+    const csv = await mock('/products', 'GET', {}, '');
+    const product = csv.split('\n')[0];
     const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,

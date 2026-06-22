@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { baza } from './baza';
-import { to_gpt } from './to_gpt';
-import { server } from './server';
+import { baza } from './baza.js';
+import { to_gpt } from './to_gpt.js';
+import { server } from './server.js';
 
 export type Resource = {
   uri: string;
