@@ -4,8 +4,7 @@
     "index": "./index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^3.25.76"
+    "@modelcontextprotocol/sdk": "^1.29.0"
   },
   "description": "MCP Server for Zerocracy",
   "devDependencies": {

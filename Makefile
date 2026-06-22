@@ -6,7 +6,7 @@
 .SHELLFLAGS := -e -o pipefail -c
 .SECONDARY:
 SHELL := bash
-TSS=$(shell find . -not -path './node_modules/**' -not -path './test/**' -name '*.ts')
+TSS=$(shell find . -not -path './.opencode/**' -not -path './node_modules/**' -not -path './test/**' -name '*.ts')
 
 all: test lint it tsc
 
