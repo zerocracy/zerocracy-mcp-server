@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { Readable, Writable } from "node:stream";
@@ -35,6 +35,7 @@ type ResponseType = JSONRPCMessage & {
 };
 
 export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
+  await server.close();
   const stdin = new Readable({
     read(): void {
       this.push(serializeMessage(message));
@@ -48,6 +49,9 @@ export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
       callback();
     }
   });
+  if (server.isConnected()) {
+    await server.close();
+  }
   await server.connect(new StdioServerTransport(stdin, stdout));
   const answer = await waitForResponse(buffer, 10000);
   await server.close();

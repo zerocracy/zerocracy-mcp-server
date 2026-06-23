@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 // Replace all whitespace with a single space and remove spaces before punctuation

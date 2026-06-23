@@ -1,23 +1,53 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, test, jest, beforeEach } from '@jest/globals';
 import { server } from '../src/server';
 import { baza } from '../src/baza';
 import { FakeTransport } from './fakes/FakeTransport';
+import { FakeBaza } from './fakes/FakeBaza';
 import { once } from './helpers/once';
 import '../src/tools';
 import '../src/resources';
 import '../src/prompts';
 
+jest.mock('../src/baza');
+
 describe('server', () => {
   const before = process.env.ZEROCRACY_TOKEN;
+  const fake = new FakeBaza();
+
+  beforeAll(async (): Promise<void> => {
+    process.env.ZEROCRACY_HOST = await fake.start();
+  });
+
+  afterAll(async (): Promise<void> => {
+    delete process.env.ZEROCRACY_HOST;
+    await fake.close();
+  });
+
+  const mock = jest.mocked(baza);
 
   beforeEach(() => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+    mock.mockImplementation(async (path, method, params) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\nproduct2\nproduct3';
+      }
+      if (path === '/mcp/tool' && method === 'PUT' && params.name === 'advice') {
+        return `Advice for ${params.product}`;
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for ${params.product}`;
+      }
+      return '';
+    });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (server.isConnected()) {
+      await server.close();
+    }
     if (before === undefined) {
       delete process.env.ZEROCRACY_TOKEN;
     } else {
@@ -29,6 +59,7 @@ describe('server', () => {
     const transport = new FakeTransport();
     await server.connect(transport);
     expect(server.isConnected()).toBe(true);
+    await server.close();
   });
 
   test('lists all tools', async (): Promise<void> => {
@@ -45,9 +76,6 @@ describe('server', () => {
 
   test('takes advice from baza', async (): Promise<void> => {
     const csv = await baza('/products', 'GET', {}, '');
-    if (csv.length === 0) {
-      return;
-    }
     const product = csv.split("\n")[0];
     const answer = await once({
       jsonrpc: '2.0' as const,
@@ -78,9 +106,7 @@ describe('server', () => {
     expect(answer).toHaveProperty('result');
     expect(answer.result).toHaveProperty('resources');
     expect(Array.isArray(answer.result?.resources)).toBe(true);
-    if (answer.result?.resources?.length === 0) {
-      return;
-    }
+    expect(answer.result?.resources?.length).toBeGreaterThan(0);
     const resource = answer.result?.resources?.[0];
     expect(resource).toHaveProperty('name');
     expect(resource).toHaveProperty('uri');
@@ -93,9 +119,6 @@ describe('server', () => {
       id: 1,
       method: 'resources/list'
     });
-    if (list.result?.resources?.length === 0) {
-      return;
-    }
     const name = list.result?.resources?.[0].name;
     expect(name).toBeDefined();
     expect(name).not.toBeNull();

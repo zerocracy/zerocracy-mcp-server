@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
@@ -15,7 +15,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - run: npm install -g eslint@9.17.0
-      - run: npm install @eslint/js
-      - run: eslint
+      - uses: actions/checkout@v7
+      - run: npm install
+      - run: npx eslint . --config eslint.config.mjs
