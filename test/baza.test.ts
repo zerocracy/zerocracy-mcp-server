@@ -19,7 +19,7 @@ describe('baza', () => {
 
   beforeEach(() => {
     process.env.ZEROCRACY_HOST = host;
-    process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+    process.env.ZEROCRACY_TOKEN = 'test-token';
   });
 
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
