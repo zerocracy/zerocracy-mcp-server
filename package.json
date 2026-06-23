@@ -32,6 +32,11 @@
   ],
   "license": "MIT",
   "main": "./index.ts",
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^9.0.7"
+    }
+  },
   "name": "zerocracy-mcp-server",
   "os": [
     "darwin",
