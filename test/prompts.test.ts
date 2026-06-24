@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, test } from '@jest/globals';
-import { once } from './helpers/once';
+import { once } from './helpers/once.js';
 import '../src/prompts';
 
 describe('prompts', () => {
