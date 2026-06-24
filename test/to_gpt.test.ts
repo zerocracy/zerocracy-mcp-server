@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, test } from '@jest/globals';
-import { to_gpt } from '../src/to_gpt';
+import { to_gpt } from '../src/to_gpt.js';
 
 describe('to_gpt', () => {
   test('compresses plain text', async () => {

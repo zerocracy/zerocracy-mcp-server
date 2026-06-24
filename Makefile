@@ -14,7 +14,7 @@ lint:
 	npx -y eslint . --config eslint.config.mjs
 
 test:
-	npx -y jest --config jest.config.ts --no-color --ci
+	node --experimental-vm-modules node_modules/.bin/jest --config jest.config.ts --no-color --ci
 
 it:
 	mkdir -p temp
@@ -22,7 +22,7 @@ it:
 	jq empty temp/tools.json || (cat temp/tools.json; ./index.ts; exit 1)
 
 tsc: $(TSS)
-	npx -y tsc --target es2020 --module nodenext --skipLibCheck --outDir dist $(TSS)
+	npx -y tsc --outDir dist --skipLibCheck $(TSS)
 
 clean:
 	rm -rf dist temp coverage
