@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { baza } from './baza';
-import { to_gpt } from './to_gpt';
-import { server } from './server';
+import { baza } from './baza.js';
+import { to_gpt } from './to_gpt.js';
+import { server } from './server.js';
 
 export type Resource = {
   uri: string;
@@ -22,7 +22,7 @@ server.resource(
         const csv = await baza('/products', 'GET', {}, '');
         let list: Array<Resource> = [];
         if (csv.length !== 0) {
-          const products = csv.split("\n");
+          const products = csv.split("\n").filter((p) => p.length > 0);
           list = products.map((product) => ({
             uri: `products://${product}`,
             name: product,
