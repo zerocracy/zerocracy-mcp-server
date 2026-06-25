@@ -12,18 +12,18 @@ describe('index', () => {
   test('reports server connection failures before exiting', async (): Promise<void> => {
     const failure = new Error('stdio connection failed');
     const connect = jest.fn<() => Promise<void>>().mockRejectedValue(failure);
-    jest.doMock('../src/server', () => ({
+    jest.unstable_mockModule('../src/server', () => ({
       server: { connect }
     }));
-    jest.doMock(
+    jest.unstable_mockModule(
       '@modelcontextprotocol/sdk/server/stdio.js',
       () => ({
         StdioServerTransport: jest.fn(() => ({}))
       })
     );
-    jest.doMock('../src/tools', () => ({}));
-    jest.doMock('../src/resources', () => ({}));
-    jest.doMock('../src/prompts', () => ({}));
+    jest.unstable_mockModule('../src/tools', () => ({}));
+    jest.unstable_mockModule('../src/resources', () => ({}));
+    jest.unstable_mockModule('../src/prompts', () => ({}));
     const logged = jest.spyOn(console, 'error').mockImplementation(() => {});
     const exited = jest.spyOn(process, 'exit').mockImplementation((): never => {
       return undefined as never;
@@ -31,7 +31,7 @@ describe('index', () => {
     const unhandled = jest.fn();
     process.prependOnceListener('unhandledRejection', unhandled);
 
-    await import('../index');
+    await import('../index.js');
     await new Promise<void>((resolve) => {
       setImmediate(resolve);
     });
