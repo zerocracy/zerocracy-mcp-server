@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, test, jest, beforeEach, afterEach } from '@jest/globals';
@@ -27,7 +27,7 @@ describe('index', () => {
 
   test('handles server connect failure', async () => {
     mockConnect.mockRejectedValue(new Error('Connection failed'));
-    await import('../index');
+    require('../index');
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(console.error).toHaveBeenCalledWith(
       'Failed to start MCP server:', expect.any(Error)
