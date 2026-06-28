@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, test } from '@jest/globals';
-import { once } from './helpers/once';
+import { once } from './helpers/once.js';
 import '../src/prompts';
 
 describe('prompts', () => {

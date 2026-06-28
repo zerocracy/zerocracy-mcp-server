@@ -6,7 +6,6 @@
 .SHELLFLAGS := -e -o pipefail -c
 .SECONDARY:
 SHELL := bash
-TSS=$(shell find . -not -path './.opencode/**' -not -path './node_modules/**' -not -path './test/**' -name '*.ts')
 
 all: test lint it tsc
 
@@ -18,11 +17,13 @@ test:
 
 it:
 	mkdir -p temp
-	npx -y @modelcontextprotocol/inspector --config test/fixtures/claude-desktop-config.json --server zerocracy --cli --method tools/list > temp/tools.json
-	jq empty temp/tools.json || (cat temp/tools.json; ./index.ts; exit 1)
+	npx -y @modelcontextprotocol/inspector --config test/fixtures/claude-desktop-config.json \
+		--server zerocracy --cli --method tools/list > temp/tools.json
+	jq empty temp/tools.json || { cat temp/tools.json; exit 1; }
+	rm -rf temp
 
-tsc: $(TSS)
-	npx -y tsc --outDir dist --skipLibCheck $(TSS)
+tsc:
+	npx -y tsc --noEmit --project tsconfig.json
 
 clean:
 	rm -rf dist temp coverage

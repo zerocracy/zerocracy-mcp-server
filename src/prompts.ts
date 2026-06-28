@@ -9,6 +9,7 @@ import { server } from './server.js';
 server.registerPrompt(
   'investigate-productivity-bottlenecks',
   { argsSchema: { product: z.string() } },
+  // @ts-ignore TS2589: type instantiation depth
   ({ product }: { product: string }) => ({
     messages: [{
       role: 'user',
