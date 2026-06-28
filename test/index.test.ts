@@ -8,9 +8,9 @@ const mockConnect = jest.fn<() => Promise<void>>();
 jest.unstable_mockModule('../src/server', () => ({
   server: {
     connect: mockConnect,
-    tool: jest.fn(),
+    registerTool: jest.fn(),
+    registerPrompt: jest.fn(),
     resource: jest.fn(),
-    prompt: jest.fn(),
   }
 }));
 
