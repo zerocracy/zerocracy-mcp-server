@@ -27,7 +27,7 @@ describe('index', () => {
 
   test('handles server connect failure', async () => {
     mockConnect.mockRejectedValue(new Error('Connection failed'));
-    await import('../index');
+    await import('../index.js');
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(console.error).toHaveBeenCalledWith(
       'Failed to start MCP server:', expect.any(Error)
