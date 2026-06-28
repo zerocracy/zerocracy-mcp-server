@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^3.25.76"
+    "zod": "^4.0.0"
   },
   "description": "MCP Server for Zerocracy",
   "devDependencies": {
