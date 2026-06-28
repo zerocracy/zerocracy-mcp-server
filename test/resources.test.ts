@@ -1,15 +1,21 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, test, jest, beforeEach } from '@jest/globals';
-import { baza } from '../src/baza';
-import { once } from './helpers/once';
 
-jest.mock('../src/baza');
+type Baza = (
+  path: string, method: string,
+  params: Record<string, string>, body: string
+) => Promise<string>;
+const mock = jest.fn<Baza>();
+
+jest.unstable_mockModule('../src/baza.js', () => ({
+  baza: mock,
+}));
+
+const { once } = await import('./helpers/once.js');
 
 describe('resources', () => {
-  const mock = jest.mocked(baza);
-
   beforeEach(() => {
     jest.resetAllMocks();
     mock.mockImplementation(async (path, method, params, body) => {
@@ -70,5 +76,30 @@ describe('resources', () => {
     const content = answer.result?.contents?.[0];
     expect(content).toHaveProperty('uri');
     expect(content).toHaveProperty('text');
+  });
+
+  test('filters empty products from trailing newlines', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\nproduct2\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('resources');
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources.length).toBe(2);
+    for (const r of resources) {
+      expect(r.name.length).toBeGreaterThan(0);
+      expect(r.uri).toMatch(/^products:\/\//);
+    }
   });
 });

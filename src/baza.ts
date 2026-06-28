@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 export const baza = async function(path: string, method: string,
   params: Record<string, string>, body: string): Promise<string> {
-  const base = 'https://www.zerocracy.com';
+  const base = process.env.ZEROCRACY_HOST ?? 'https://www.zerocracy.com';
   const query = new URLSearchParams(params);
   const uri = `${base}${path}?${query.toString()}`;
   const headers: HeadersInit = new Headers();
@@ -21,7 +21,14 @@ export const baza = async function(path: string, method: string,
   if (body.length > 0) {
     meta['body'] = body;
   }
-  const response = await fetch(uri, meta);
+  let response: Response;
+  try {
+    response = await fetch(uri, meta);
+  } catch (e) {
+    throw new Error(
+      `Network failure for ${method} ${uri}: ${(e as Error).message}`
+    );
+  }
   if (response.status != 200) {
     let error = `HTTP error ${response.status}`;
     const why = response.headers.get('X-Zerocracy-Failure');

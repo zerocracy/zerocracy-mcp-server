@@ -1,14 +1,14 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
 import { Readable, Writable } from "node:stream";
 import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { ReadBuffer, serializeMessage } from "@modelcontextprotocol/sdk/shared/stdio.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { server } from '../../src/server';
-import '../../src/tools';
-import '../../src/resources';
-import '../../src/prompts';
+import { server } from '../../src/server.js';
+import '../../src/tools.js';
+import '../../src/resources.js';
+import '../../src/prompts.js';
 
 const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
   const start = Date.now();
@@ -35,6 +35,7 @@ type ResponseType = JSONRPCMessage & {
 };
 
 export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
+  await server.close();
   const stdin = new Readable({
     read(): void {
       this.push(serializeMessage(message));
@@ -48,6 +49,9 @@ export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
       callback();
     }
   });
+  if (server.isConnected()) {
+    await server.close();
+  }
   await server.connect(new StdioServerTransport(stdin, stdout));
   const answer = await waitForResponse(buffer, 10000);
   await server.close();

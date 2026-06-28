@@ -1,25 +1,29 @@
-// SPDX-FileCopyrightText: Copyright (c) 2025 Zerocracy
+// SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, test } from '@jest/globals';
-import { baza } from '../src/baza';
+import { afterAll, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { baza } from '../src/baza.js';
+import { FakeBaza } from './fakes/FakeBaza.js';
 
 describe('baza', () => {
-  const before = process.env.ZEROCRACY_TOKEN;
+  const fake = new FakeBaza();
+  let host = '';
 
-  beforeEach(() => {
-    process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
+  beforeAll(async (): Promise<void> => {
+    host = await fake.start();
   });
 
-  afterEach(() => {
-    if (before === undefined) {
-      delete process.env.ZEROCRACY_TOKEN;
-    } else {
-      process.env.ZEROCRACY_TOKEN = before;
-    }
+  afterAll(async (): Promise<void> => {
+    await fake.close();
+  });
+
+  beforeEach(() => {
+    process.env.ZEROCRACY_HOST = host;
+    process.env.ZEROCRACY_TOKEN = 'test-token';
   });
 
   test('throws when ZEROCRACY_TOKEN is not set', async (): Promise<void> => {
+    delete process.env.ZEROCRACY_HOST;
     delete process.env.ZEROCRACY_TOKEN;
     await expect(
       baza('/robots.txt', 'GET', {}, '')
@@ -39,7 +43,20 @@ describe('baza', () => {
 
   test('does not follow redirects', async () => {
     await expect(
-      baza('/mcp/tool', 'PUT', {}, '')
+      baza('/redirect', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
+  });
+
+  test('wraps network failures in typed Error', async () => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock.mockRejectedValue(new TypeError('fetch failed'));
+    try {
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(Error);
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(
+        'Network failure for GET'
+      );
+    } finally {
+      mock.mockRestore();
+    }
   });
 });
