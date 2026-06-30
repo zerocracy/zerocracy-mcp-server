@@ -1,8 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 # SPDX-License-Identifier: MIT
----
-errors:
-  - yegor256@gmail.com
-tags:
-  - pdd
-  - bug
+
+maxbodylength = 10
+minphony = 1
