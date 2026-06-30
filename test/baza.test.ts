@@ -59,6 +59,17 @@ describe('baza', () => {
     expect(Object.getOwnPropertyDescriptor(thrown, 'cause')?.value).toBe(failure);
   });
 
+  test('wraps non-error network failures', async (): Promise<void> => {
+    const fetch = jest.spyOn(globalThis, 'fetch').mockRejectedValue('socket closed');
+    try {
+      await expect(
+        baza('/robots.txt', 'GET', {}, '')
+      ).rejects.toThrow(`Network failure for GET ${host}/robots.txt?: socket closed`);
+    } finally {
+      fetch.mockRestore();
+    }
+  });
+
   test('does not follow redirects', async () => {
     await expect(
       baza('/redirect', 'PUT', {}, '')
