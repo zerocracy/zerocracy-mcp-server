@@ -5,6 +5,6 @@
 export const to_gpt = function(txt: string): string {
   return txt
     .replace(/\s+/g, ' ')
-    .replace(/ (\?|!|\|,|:)/g, '$1')
+    .replace(/ ([?!,:])/g, '$1')
     .trim();
 }

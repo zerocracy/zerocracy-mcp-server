@@ -8,4 +8,8 @@ describe('to_gpt', () => {
   test('compresses plain text', async () => {
     expect(to_gpt('  How\n \t are \n\n you   ?  ')).toEqual('How are you?');
   });
+
+  test('removes spaces before punctuation', async () => {
+    expect(to_gpt('Wait ! Look , here : why ?')).toEqual('Wait! Look, here: why?');
+  });
 });
