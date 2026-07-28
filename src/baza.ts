@@ -24,10 +24,13 @@ export const baza = async function(path: string, method: string,
   let response: Response;
   try {
     response = await fetch(uri, meta);
-  } catch (e) {
-    throw new Error(
-      `Network failure for ${method} ${uri}: ${(e as Error).message}`
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    const failure = new Error(
+      `Network failure for ${method} ${uri}: ${reason}`
     );
+    Object.defineProperty(failure, 'cause', { value: error });
+    throw failure;
   }
   if (response.status != 200) {
     let error = `HTTP error ${response.status}`;
