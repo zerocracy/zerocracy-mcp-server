@@ -17,8 +17,7 @@ test:
 
 it:
 	mkdir -p temp
-	npx -y @modelcontextprotocol/inspector --cli \
-		--config test/fixtures/claude-desktop-config.json \
+	npx -y @modelcontextprotocol/inspector --cli --config test/fixtures/claude-desktop-config.json \
 		--server zerocracy --method tools/list > temp/tools.json
 	jq empty temp/tools.json || { cat temp/tools.json; exit 1; }
 	rm -rf temp
