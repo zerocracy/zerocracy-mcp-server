@@ -59,4 +59,24 @@ describe('baza', () => {
       mock.mockRestore();
     }
   });
+
+  test('refuses a token with a trailing newline', async (): Promise<void> => {
+    process.env.ZEROCRACY_TOKEN = 'test-token\n';
+    await expect(
+      baza('/robots.txt', 'GET', {}, '')
+    ).rejects.toThrow('ZEROCRACY_TOKEN must not contain a line break');
+  });
+
+  test('refuses a token with a carriage return', async (): Promise<void> => {
+    process.env.ZEROCRACY_TOKEN = 'test\rtoken';
+    await expect(
+      baza('/robots.txt', 'GET', {}, '')
+    ).rejects.toThrow(Error);
+  });
+
+  test('keeps taking a token with spaces around it', async (): Promise<void> => {
+    process.env.ZEROCRACY_TOKEN = '  test-token  ';
+    const body = await baza('/robots.txt', 'GET', {}, '');
+    expect(body).toContain('Disallow');
+  });
 });
