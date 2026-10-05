@@ -17,14 +17,3 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: yegor256/copyrights-action@0.0.12
-        with:
-          globs: >-
-            Dockerfile
-            LICENSE.txt
-            Makefile
-            Rakefile
-            **/*.sh
-            **/*.scss
-            **/*.rb
-            **/*.fe
-            **/*.yml
