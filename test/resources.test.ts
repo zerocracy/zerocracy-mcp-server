@@ -78,6 +78,26 @@ describe('resources', () => {
     expect(content).toHaveProperty('text');
   });
 
+  test('lists no resources when baza returns an empty product list', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return '';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('resources');
+    expect(answer.result?.resources).toEqual([]);
+  });
+
   test('filters empty products from trailing newlines', async (): Promise<void> => {
     mock.mockImplementation(async (path, method, params, body) => {
       if (path === '/products' && method === 'GET') {
