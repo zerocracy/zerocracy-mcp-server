@@ -16,9 +16,9 @@ test:
 	node --experimental-vm-modules node_modules/.bin/jest --config jest.config.ts --no-color --ci
 
 it:
-	mkdir -p temp
-	npx -y @modelcontextprotocol/inspector --config test/fixtures/claude-desktop-config.json \
-		--server zerocracy --cli --method tools/list > temp/tools.json
+	mkdir -p temp && npx -y @modelcontextprotocol/inspector --cli \
+		--config test/fixtures/claude-desktop-config.json \
+		--server zerocracy --method tools/list > temp/tools.json
 	jq empty temp/tools.json || { cat temp/tools.json; exit 1; }
 	rm -rf temp
 
