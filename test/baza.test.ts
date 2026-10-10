@@ -37,14 +37,17 @@ describe('baza', () => {
 
   test('fetches non-existing page', async () => {
     await expect(
-      baza('/this/path/does/not/exist', 'POST', {}, 'boom')
-    ).rejects.toThrow('HTTP error 404');
+      baza('/this/path/does/not/exist', 'POST', { product: 'hello world' }, 'boom')
+    ).rejects.toThrow(
+      `HTTP error 404 for POST ${host}/this/path/does/not/exist?product=hello+world`
+      + ': No page at /this/path/does/not/exist'
+    );
   });
 
   test('does not follow redirects', async () => {
     await expect(
       baza('/redirect', 'PUT', {}, '')
-    ).rejects.toThrow('HTTP error 303');
+    ).rejects.toThrow(`HTTP error 303 for PUT ${host}/redirect?`);
   });
 
   test('wraps network failures in typed Error', async () => {

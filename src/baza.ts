@@ -30,7 +30,7 @@ export const baza = async function(path: string, method: string,
     );
   }
   if (response.status != 200) {
-    let error = `HTTP error ${response.status}`;
+    let error = `HTTP error ${response.status} for ${method} ${uri}`;
     const why = response.headers.get('X-Zerocracy-Failure');
     if (why) {
       error += `: ${why}`;
