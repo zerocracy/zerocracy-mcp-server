@@ -15,7 +15,7 @@ jest.unstable_mockModule('../src/baza.js', () => ({
 
 const { once } = await import('./helpers/once.js');
 
-describe('resources', () => {
+describe('tools', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     mock.mockImplementation(async (path, method, params, body) => {
@@ -30,26 +30,73 @@ describe('resources', () => {
   });
 
   test('takes fake advice from baza', async (): Promise<void> => {
-    const csv = await mock('/products', 'GET', {}, '');
-    if (csv.length === 0) {
-      return;
-    }
-    const product = csv.split("\n")[0];
     const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
       method: 'tools/call',
       params: {
         name: 'give_management_advice',
-        product: product,
-        concern: 'what is going on?'
+        arguments: {
+          product: 'product1',
+          concern: 'what is going on?'
+        }
       },
     });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('content');
-    expect(Array.isArray(answer.result?.content)).toBe(true);
-    expect(answer.result?.content?.length).toBeGreaterThan(0);
-    const text = answer.result?.content?.[0].text;
-    expect(text).not.toContain('HTTP error');
+    expect(answer.result).not.toHaveProperty('isError', true);
+    expect(answer.result?.content).toEqual([
+      { type: 'text', text: 'Some advice for product product1' }
+    ]);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith(
+      '/mcp/tool', 'PUT', { name: 'advice', product: 'product1' }, 'what is going on?'
+    );
+  });
+
+  test.each([
+    { field: 'product', kind: 'empty', value: '' },
+    { field: 'product', kind: 'whitespace-only', value: ' \t\n ' },
+    { field: 'concern', kind: 'empty', value: '' },
+    { field: 'concern', kind: 'whitespace-only', value: ' \t\n ' }
+  ])('rejects $kind $field without calling baza', async ({ field, value }): Promise<void> => {
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'give_management_advice',
+        arguments: {
+          product: 'product1',
+          concern: 'what is going on?',
+          [field]: value
+        }
+      }
+    });
+    expect(answer.result).toHaveProperty('isError', true);
+    expect(answer.result?.content?.[0].text).toContain('Input validation error');
+    expect(answer.result?.content?.[0].text).toContain(field);
+    expect(mock).not.toHaveBeenCalled();
+  });
+
+  test('trims valid arguments before calling baza', async (): Promise<void> => {
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'give_management_advice',
+        arguments: {
+          product: ' \tproduct1\n ',
+          concern: '\n what is going on? \t'
+        }
+      }
+    });
+    expect(answer.result).not.toHaveProperty('isError', true);
+    expect(answer.result?.content).toEqual([
+      { type: 'text', text: 'Some advice for product product1' }
+    ]);
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith(
+      '/mcp/tool', 'PUT', { name: 'advice', product: 'product1' }, 'what is going on?'
+    );
   });
 });
