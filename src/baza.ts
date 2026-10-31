@@ -12,6 +12,16 @@ export const baza = async function(path: string, method: string,
   if (!token) {
     throw new Error("You must set ZEROCRACY_TOKEN environment variable");
   }
+  // A token is configuration, and one that cannot go into a header is
+  // reported by name here. Headers.set refuses a line break or a NUL and
+  // throws a TypeError about an API the user never called, which is what a
+  // token read out of a file with its trailing newline attached used to get.
+  if (/[\r\n\0]/.test(token)) {
+    throw new Error(
+      "ZEROCRACY_TOKEN must not contain a line break or a NUL character, "
+      + "since it cannot be sent in an HTTP header"
+    );
+  }
   headers.set('X-Zerocracy-Token', token);
   const meta: Record<string, unknown> = {
     method: method,
