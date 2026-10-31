@@ -41,22 +41,38 @@ describe('baza', () => {
     ).rejects.toThrow('HTTP error 404');
   });
 
+  test('wraps network failures', async (): Promise<void> => {
+    const failure = new TypeError('fetch failed');
+    const fetch = jest.spyOn(globalThis, 'fetch').mockRejectedValue(failure);
+    let thrown: unknown;
+    try {
+      await baza('/robots.txt', 'GET', {}, '');
+    } catch (error: unknown) {
+      thrown = error;
+    } finally {
+      fetch.mockRestore();
+    }
+    expect(thrown).toBeInstanceOf(Error);
+    expect((thrown as Error).message).toBe(
+      `Network failure for GET ${host}/robots.txt?: fetch failed`
+    );
+    expect(Object.getOwnPropertyDescriptor(thrown, 'cause')?.value).toBe(failure);
+  });
+
+  test('wraps non-error network failures', async (): Promise<void> => {
+    const fetch = jest.spyOn(globalThis, 'fetch').mockRejectedValue('socket closed');
+    try {
+      await expect(
+        baza('/robots.txt', 'GET', {}, '')
+      ).rejects.toThrow(`Network failure for GET ${host}/robots.txt?: socket closed`);
+    } finally {
+      fetch.mockRestore();
+    }
+  });
+
   test('does not follow redirects', async () => {
     await expect(
       baza('/redirect', 'PUT', {}, '')
     ).rejects.toThrow('HTTP error 303');
-  });
-
-  test('wraps network failures in typed Error', async () => {
-    const mock = jest.spyOn(globalThis, 'fetch');
-    mock.mockRejectedValue(new TypeError('fetch failed'));
-    try {
-      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(Error);
-      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(
-        'Network failure for GET'
-      );
-    } finally {
-      mock.mockRestore();
-    }
   });
 });
