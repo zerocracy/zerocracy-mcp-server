@@ -42,6 +42,7 @@ server.resource(
   async (uri, { name }) => ({
     contents: [{
       uri: uri.href,
+      mimeType: 'text/plain',
       text: await baza(
         '/mcp/resource', 'PUT',
         { name: 'product', product: String(name) },
