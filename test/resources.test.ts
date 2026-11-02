@@ -102,4 +102,102 @@ describe('resources', () => {
       expect(r.uri).toMatch(/^products:\/\//);
     }
   });
+
+  test('reads back a product whose name carries a space', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'my product';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const list = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = list.result?.resources as Array<{name: string; uri: string}>;
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 2,
+      method: 'resources/read',
+      params: {
+        uri: resources[0].uri
+      }
+    });
+    expect(answer).not.toHaveProperty('error');
+    expect(answer.result?.contents?.[0]).toHaveProperty(
+      'text', 'Details for product my product'
+    );
+  });
+
+  test('reads back a product whose name carries a slash', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'a/b';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const list = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = list.result?.resources as Array<{name: string; uri: string}>;
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 2,
+      method: 'resources/read',
+      params: {
+        uri: resources[0].uri
+      }
+    });
+    expect(answer).not.toHaveProperty('error');
+    expect(answer.result?.contents?.[0]).toHaveProperty(
+      'text', 'Details for product a/b'
+    );
+  });
+
+  test('keeps the plain name in the listing', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'my product';
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources[0].name).toBe('my product');
+    expect(resources[0].uri).toBe('products://my%20product');
+  });
+
+  test('takes a name that cannot be decoded as it stands', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/read',
+      params: {
+        uri: 'products://50%'
+      }
+    });
+    expect(answer).not.toHaveProperty('error');
+    expect(answer.result?.contents?.[0]).toHaveProperty(
+      'text', 'Details for product 50%'
+    );
+  });
 });
