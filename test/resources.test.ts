@@ -102,4 +102,29 @@ describe('resources', () => {
       expect(r.uri).toMatch(/^products:\/\//);
     }
   });
+
+  test('strips carriage returns from CRLF-terminated products', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\r\nproduct2\r\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer).toHaveProperty('result');
+    expect(answer.result).toHaveProperty('resources');
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources.length).toBe(2);
+    expect(resources[0].name).toBe('product1');
+    expect(resources[0].uri).toBe('products://product1');
+    expect(resources[1].name).toBe('product2');
+    expect(resources[1].uri).toBe('products://product2');
+  });
 });
