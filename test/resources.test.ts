@@ -78,6 +78,74 @@ describe('resources', () => {
     expect(content).toHaveProperty('text');
   });
 
+  test('skips blank and whitespace-only product records', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\n\n   \n\t\nproduct2\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources.map((r) => r.name)).toStrictEqual(['product1', 'product2']);
+    expect(resources.map((r) => r.uri)).toStrictEqual([
+      'products://product1',
+      'products://product2'
+    ]);
+  });
+
+  test('trims surrounding whitespace from product names', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return '  product one  \n\tproduct2\t\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = answer.result?.resources as Array<{
+      name: string; uri: string; description: string
+    }>;
+    expect(resources.map((r) => r.name)).toStrictEqual(['product one', 'product2']);
+    expect(resources.map((r) => r.uri)).toStrictEqual([
+      'products://product one',
+      'products://product2'
+    ]);
+    expect(resources[0].description).toContain('"product one"');
+  });
+
+  test('handles CRLF product records', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return 'product1\r\n   \r\nproduct2\r\n';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    expect(resources.map((r) => r.name)).toStrictEqual(['product1', 'product2']);
+  });
+
   test('filters empty products from trailing newlines', async (): Promise<void> => {
     mock.mockImplementation(async (path, method, params, body) => {
       if (path === '/products' && method === 'GET') {
