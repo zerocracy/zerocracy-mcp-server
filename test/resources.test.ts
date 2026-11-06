@@ -78,6 +78,28 @@ describe('resources', () => {
     expect(content).toHaveProperty('text');
   });
 
+  test('preserves the listed MIME type when reading a resource', async (): Promise<void> => {
+    const list = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(list.result?.resources).toHaveLength(3);
+    const resource = list.result!.resources![0];
+    expect(resource.mimeType).toBe('text/plain');
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 2,
+      method: 'resources/read',
+      params: { uri: resource.uri }
+    });
+    expect(answer.result?.contents).toEqual([{
+      uri: resource.uri,
+      mimeType: resource.mimeType,
+      text: `Details for product ${resource.name}`
+    }]);
+  });
+
   test('filters empty products from trailing newlines', async (): Promise<void> => {
     mock.mockImplementation(async (path, method, params, body) => {
       if (path === '/products' && method === 'GET') {
