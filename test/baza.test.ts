@@ -111,4 +111,23 @@ describe('baza', () => {
       await new Promise<void>((resolve) => { http.close(() => resolve()); });
     }
   });
+
+  test.each([new Error('cancelled by caller'), 'cancelled by caller'])(
+    'preserves cancellation that precedes the request (%p)', async (reason) => {
+      const cancellation = new AbortController();
+      cancellation.abort(reason);
+      await expect(baza('/robots.txt', 'GET', {}, '', cancellation.signal)).rejects.toThrow(
+        'cancelled by caller'
+      );
+    }
+  );
+
+  test('keeps the timeout when the caller does not cancel', async () => {
+    process.env.ZEROCRACY_TIMEOUT_MS = '100';
+    const cancellation = new AbortController();
+    await expect(baza('/stalled-headers', 'GET', {}, '', cancellation.signal)).rejects.toThrow(
+      'timed out after 100ms'
+    );
+    expect(cancellation.signal.aborted).toBe(false);
+  });
 });

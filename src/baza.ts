@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 export const baza = async function(path: string, method: string,
-  params: Record<string, string>, body: string): Promise<string> {
+  params: Record<string, string>, body: string, signal?: AbortSignal): Promise<string> {
   const base = process.env.ZEROCRACY_HOST ?? 'https://www.zerocracy.com';
   const query = new URLSearchParams(params);
   const uri = `${base}${path}?${query.toString()}`;
@@ -16,7 +16,8 @@ export const baza = async function(path: string, method: string,
   const meta: Record<string, unknown> = {
     method: method,
     headers: headers,
-    redirect: 'manual'
+    redirect: 'manual',
+    signal: signal
   };
   if (body.length > 0) {
     meta['body'] = body;
@@ -26,6 +27,12 @@ export const baza = async function(path: string, method: string,
     throw new Error('ZEROCRACY_TIMEOUT_MS must be an integer between 1 and 2147483647');
   }
   const controller = new AbortController();
+  const cancel = (): void => controller.abort(signal?.reason);
+  if (signal?.aborted) {
+    cancel();
+  } else {
+    signal?.addEventListener('abort', cancel, { once: true });
+  }
   meta['signal'] = controller.signal;
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -36,8 +43,9 @@ export const baza = async function(path: string, method: string,
         return await response.text();
       }
     } catch (e) {
-      const why = controller.signal.aborted
-        ? `timed out after ${timeout}ms` : (e as Error).message;
+      const message = e instanceof Error ? e.message : String(e);
+      const why = controller.signal.aborted && !signal?.aborted
+        ? `timed out after ${timeout}ms` : message;
       throw new Error(`Network failure for ${method} ${uri}: ${why}`);
     }
     let error = `HTTP error ${response.status}`;
@@ -47,6 +55,7 @@ export const baza = async function(path: string, method: string,
     }
     throw new Error(error);
   } finally {
+    signal?.removeEventListener('abort', cancel);
     clearTimeout(timer);
     controller.abort();
   }
