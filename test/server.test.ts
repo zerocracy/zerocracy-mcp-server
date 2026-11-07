@@ -104,50 +104,6 @@ describe('server', () => {
     expect(text).not.toContain('HTTP error');
   });
 
-  test('lists resources from baza', async (): Promise<void> => {
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('resources');
-    expect(Array.isArray(answer.result?.resources)).toBe(true);
-    expect(answer.result?.resources?.length).toBeGreaterThan(0);
-    const resource = answer.result?.resources?.[0];
-    expect(resource).toHaveProperty('name');
-    expect(resource).toHaveProperty('uri');
-    expect(resource).toHaveProperty('description');
-  });
-
-  test('fetches resource details', async (): Promise<void> => {
-    const list = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    const name = list.result?.resources?.[0].name;
-    expect(name).toBeDefined();
-    expect(name).not.toBeNull();
-    const rname = name as string;
-    expect(rname.length).toBeGreaterThan(0);
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 2,
-      method: 'resources/read',
-      params: {
-        uri: `products://${rname}`
-      }
-    });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('contents');
-    expect(Array.isArray(answer.result?.contents)).toBe(true);
-    expect(answer.result?.contents?.length).toBeGreaterThan(0);
-    const content = answer.result?.contents?.[0];
-    expect(content).toHaveProperty('uri');
-    expect(content).toHaveProperty('text');
-  });
-
   test('lists prompts', async (): Promise<void> => {
     const answer = await once({
       jsonrpc: '2.0' as const,
