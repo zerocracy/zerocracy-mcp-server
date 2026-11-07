@@ -21,7 +21,10 @@ server.registerTool(
       issues or pull requests.
       `
     ),
-    inputSchema: { concern: z.string(), product: z.string() }
+    inputSchema: {
+      concern: z.string().trim().min(1),
+      product: z.string().trim().min(1)
+    }
   },
   // @ts-ignore TS2589 type depth
   async ({ concern, product }: { concern: string; product: string }) => {
