@@ -13,7 +13,7 @@ export type Resource = {
   mimeType?: string;
 };
 
-server.resource(
+server.registerResource(
   'product',
   new ResourceTemplate(
     'products://{name}',
@@ -42,6 +42,7 @@ server.resource(
       }
     }
   ),
+  {},
   async (uri, { name }) => ({
     contents: [{
       uri: uri.href,
