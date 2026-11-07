@@ -101,6 +101,20 @@ describe('resources', () => {
     ]);
   });
 
+  test('lists each normalized product once in its original order', async (): Promise<void> => {
+    mock.mockResolvedValue('product2\n product1 \r\nproduct2\n\tproduct1\t\n\nProduct1\n');
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer.result?.resources).toMatchObject([
+      { name: 'product2', uri: 'products://product2' },
+      { name: 'product1', uri: 'products://product1' },
+      { name: 'Product1', uri: 'products://Product1' }
+    ]);
+  });
+
   test('trims surrounding whitespace from product names', async (): Promise<void> => {
     mock.mockImplementation(async (path, method, params, body) => {
       if (path === '/products' && method === 'GET') {
