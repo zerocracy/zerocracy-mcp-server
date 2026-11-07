@@ -21,21 +21,33 @@ export const baza = async function(path: string, method: string,
   if (body.length > 0) {
     meta['body'] = body;
   }
-  let response: Response;
-  try {
-    response = await fetch(uri, meta);
-  } catch (e) {
-    throw new Error(
-      `Network failure for ${method} ${uri}: ${(e as Error).message}`
-    );
+  const timeout = Number(process.env.ZEROCRACY_TIMEOUT_MS ?? '30000');
+  if (!Number.isInteger(timeout) || timeout < 1 || timeout > 2147483647) {
+    throw new Error('ZEROCRACY_TIMEOUT_MS must be an integer between 1 and 2147483647');
   }
-  if (response.status != 200) {
+  const controller = new AbortController();
+  meta['signal'] = controller.signal;
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    let response: Response;
+    try {
+      response = await fetch(uri, meta);
+      if (response.status === 200) {
+        return await response.text();
+      }
+    } catch (e) {
+      const why = controller.signal.aborted
+        ? `timed out after ${timeout}ms` : (e as Error).message;
+      throw new Error(`Network failure for ${method} ${uri}: ${why}`);
+    }
     let error = `HTTP error ${response.status}`;
     const why = response.headers.get('X-Zerocracy-Failure');
     if (why) {
       error += `: ${why}`;
     }
     throw new Error(error);
+  } finally {
+    clearTimeout(timer);
+    controller.abort();
   }
-  return await response.text();
 }
