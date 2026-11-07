@@ -16,5 +16,5 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - run: npm install
+      - run: npm ci
       - run: npx eslint . --config eslint.config.mjs
