@@ -2,10 +2,11 @@
   "type": "module",
   "author": "Yegor Bugayenko <yegor256@gmail.com> (https://www.yegor256.com/)",
   "bin": {
-    "index": "./index.ts"
+    "index": "./cli.cjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "tsx": "^4.19.4",
     "zod": "^4.0.0"
   },
   "description": "MCP Server for Zerocracy",
@@ -18,7 +19,6 @@
     "jest": "^30.0.0",
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.1"
   },
