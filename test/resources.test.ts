@@ -38,9 +38,7 @@ describe('resources', () => {
     expect(answer).toHaveProperty('result');
     expect(answer.result).toHaveProperty('resources');
     expect(Array.isArray(answer.result?.resources)).toBe(true);
-    if (answer.result?.resources?.length === 0) {
-      return;
-    }
+    expect(answer.result?.resources).toHaveLength(3);
     const resource = answer.result?.resources?.[0];
     expect(resource).toHaveProperty('name');
     expect(resource).toHaveProperty('uri');
@@ -53,9 +51,7 @@ describe('resources', () => {
       id: 1,
       method: 'resources/list'
     });
-    if (list.result?.resources?.length === 0) {
-      return;
-    }
+    expect(list.result?.resources).toHaveLength(3);
     const name = list.result?.resources?.[0].name;
     expect(name).toBeDefined();
     expect(name).not.toBeNull();
