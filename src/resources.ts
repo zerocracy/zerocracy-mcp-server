@@ -26,7 +26,7 @@ server.resource(
             .split("\n")
             .map((p) => p.trim())
             .filter((p) => p.length > 0);
-          list = products.map((product) => ({
+          list = [...new Set(products)].map((product) => ({
             uri: `products://${product}`,
             name: product,
             description: to_gpt(
