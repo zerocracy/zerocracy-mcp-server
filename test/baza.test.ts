@@ -59,4 +59,115 @@ describe('baza', () => {
       mock.mockRestore();
     }
   });
+
+  test('retries a 503 and then succeeds', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock
+      .mockResolvedValueOnce(new Response('', { status: 503 }))
+      .mockResolvedValueOnce(new Response('recovered', { status: 200 }));
+    try {
+      expect(await baza('/test', 'GET', {}, '')).toBe('recovered');
+      expect(mock).toHaveBeenCalledTimes(2);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('honors Retry-After seconds', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock
+      .mockResolvedValueOnce(new Response('', {
+        status: 503, headers: { 'Retry-After': '1' }
+      }))
+      .mockResolvedValueOnce(new Response('done', { status: 200 }));
+    const start = Date.now();
+    try {
+      expect(await baza('/test', 'GET', {}, '')).toBe('done');
+      expect(Date.now() - start).toBeGreaterThanOrEqual(900);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('honors Retry-After HTTP-date', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock
+      .mockResolvedValueOnce(new Response('', {
+        status: 503,
+        headers: { 'Retry-After': new Date(Date.now() + 2000).toUTCString() }
+      }))
+      .mockResolvedValueOnce(new Response('done', { status: 200 }));
+    const start = Date.now();
+    try {
+      expect(await baza('/test', 'GET', {}, '')).toBe('done');
+      expect(Date.now() - start).toBeGreaterThanOrEqual(900);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('does not retry a permanent 4xx', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock.mockResolvedValue(new Response('', {
+      status: 404, headers: { 'X-Zerocracy-Failure': 'No such page' }
+    }));
+    try {
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(
+        'HTTP error 404: No such page'
+      );
+      expect(mock).toHaveBeenCalledTimes(1);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('does not retry a non-idempotent POST', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock.mockResolvedValue(new Response('', {
+      status: 503, headers: { 'Retry-After': '0' }
+    }));
+    try {
+      await expect(baza('/test', 'POST', {}, 'boom')).rejects.toThrow(
+        'HTTP error 503'
+      );
+      expect(mock).toHaveBeenCalledTimes(1);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('gives up after a bounded number of retries', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock.mockResolvedValue(new Response('', { status: 503 }));
+    const start = Date.now();
+    try {
+      await expect(baza('/test', 'GET', {}, '')).rejects.toThrow(
+        'HTTP error 503'
+      );
+      expect(mock).toHaveBeenCalledTimes(4);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(1700);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('falls back to backoff when Retry-After is unusable', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock
+      .mockResolvedValueOnce(new Response('', {
+        status: 503, headers: { 'Retry-After': 'soon' }
+      }))
+      .mockResolvedValueOnce(new Response('', {
+        status: 503, headers: { 'Retry-After': '-5' }
+      }))
+      .mockResolvedValueOnce(new Response('done', { status: 200 }));
+    const start = Date.now();
+    try {
+      expect(await baza('/test', 'GET', {}, '')).toBe('done');
+      expect(mock).toHaveBeenCalledTimes(3);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(700);
+    } finally {
+      mock.mockRestore();
+    }
+  });
 });
