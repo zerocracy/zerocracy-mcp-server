@@ -1,17 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 // SPDX-License-Identifier: MIT
 
-import { afterAll, beforeAll, describe, expect, jest, test, beforeEach } from '@jest/globals';
-
-type Baza = (
-  path: string, method: string,
-  params: Record<string, string>, body: string
-) => Promise<string>;
-const mock = jest.fn<Baza>();
-
-jest.unstable_mockModule('../src/baza.js', () => ({
-  baza: mock,
-}));
+import { afterAll, beforeAll, describe, expect, test, beforeEach } from '@jest/globals';
+import { baza } from '../src/baza.js';
 
 const { FakeTransport } = await import('./fakes/FakeTransport.js');
 const { FakeBaza } = await import('./fakes/FakeBaza.js');
@@ -36,19 +27,6 @@ describe('server', () => {
 
   beforeEach(() => {
     process.env.ZEROCRACY_TOKEN = '00000000-0000-0000-0000-000000000000';
-    jest.resetAllMocks();
-    mock.mockImplementation(async (path, method, params) => {
-      if (path === '/products' && method === 'GET') {
-        return 'product1\nproduct2\nproduct3';
-      }
-      if (path === '/mcp/tool' && method === 'PUT' && params.name === 'advice') {
-        return `Advice for ${params.product}`;
-      }
-      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
-        return `Details for ${params.product}`;
-      }
-      return '';
-    });
   });
 
   afterEach(async () => {
@@ -82,7 +60,7 @@ describe('server', () => {
   });
 
   test('takes advice from baza', async (): Promise<void> => {
-    const csv = await mock('/products', 'GET', {}, '');
+    const csv = await baza('/products', 'GET', {}, '');
     const product = csv.split('\n')[0];
     const answer = await once({
       jsonrpc: '2.0' as const,
@@ -102,6 +80,7 @@ describe('server', () => {
     expect(answer.result?.content?.length).toBeGreaterThan(0);
     const text = answer.result?.content?.[0].text;
     expect(text).not.toContain('HTTP error');
+    expect(text).toBe('Advice about hello-world');
   });
 
   test('lists resources from baza', async (): Promise<void> => {
@@ -118,6 +97,8 @@ describe('server', () => {
     expect(resource).toHaveProperty('name');
     expect(resource).toHaveProperty('uri');
     expect(resource).toHaveProperty('description');
+    expect(answer.result?.resources?.map((r) => r.name))
+      .toEqual(['hello-world', 'foo-bar']);
   });
 
   test('fetches resource details', async (): Promise<void> => {
@@ -146,6 +127,7 @@ describe('server', () => {
     const content = answer.result?.contents?.[0];
     expect(content).toHaveProperty('uri');
     expect(content).toHaveProperty('text');
+    expect(content?.text).toBe('Details about hello-world');
   });
 
   test('lists prompts', async (): Promise<void> => {
