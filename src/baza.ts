@@ -16,7 +16,8 @@ const pause = async (response: Response, attempt: number): Promise<void> => {
   if (!Number.isFinite(ms) || ms < 0) {
     ms = 250 * 2 ** attempt;
   }
-  // shortcut: Retry-After is honored as-is, cap it if a server demands long waits
+  // shortcut: waits capped at 10 s, raise the cap if Baza asks for longer waits
+  ms = Math.min(ms, 10000);
   await new Promise<void>((resolve): void => {
     setTimeout(resolve, ms);
   });

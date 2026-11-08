@@ -170,4 +170,38 @@ describe('baza', () => {
       mock.mockRestore();
     }
   });
+
+  test('retries a 429 on PUT', async (): Promise<void> => {
+    const mock = jest.spyOn(globalThis, 'fetch');
+    mock
+      .mockResolvedValueOnce(new Response('', {
+        status: 429, headers: { 'Retry-After': '0' }
+      }))
+      .mockResolvedValueOnce(new Response('done', { status: 200 }));
+    try {
+      expect(await baza('/test', 'PUT', {}, 'body')).toBe('done');
+      expect(mock).toHaveBeenCalledTimes(2);
+    } finally {
+      mock.mockRestore();
+    }
+  });
+
+  test('caps a huge Retry-After', async (): Promise<void> => {
+    jest.useFakeTimers();
+    const mock = jest.spyOn(globalThis, 'fetch');
+    try {
+      mock
+        .mockResolvedValueOnce(new Response('', {
+          status: 503, headers: { 'Retry-After': '3600' }
+        }))
+        .mockResolvedValueOnce(new Response('done', { status: 200 }));
+      const call = baza('/test', 'GET', {}, '');
+      await jest.advanceTimersByTimeAsync(10000);
+      expect(await call).toBe('done');
+      expect(mock).toHaveBeenCalledTimes(2);
+    } finally {
+      mock.mockRestore();
+      jest.useRealTimers();
+    }
+  });
 });
