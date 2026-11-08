@@ -65,9 +65,14 @@ describe('resources', () => {
 
   test('describes each product by its name', async (): Promise<void> => {
     const resources = await listing('product1\nproduct2\nproduct3');
-    expect(
-      resources.every((r) => r.description?.includes(`"${r.name}"`))
-    ).toBe(true);
+    expect(resources.map((r) => r.description)).toStrictEqual([
+      'A software product named "product1" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.',
+      'A software product named "product2" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.',
+      'A software product named "product3" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.'
+    ]);
   });
 
   test('reads a product by a fixed URI', async (): Promise<void> => {
