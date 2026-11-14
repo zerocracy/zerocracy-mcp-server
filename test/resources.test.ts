@@ -170,4 +170,22 @@ describe('resources', () => {
       expect(r.uri).toMatch(/^products:\/\//);
     }
   });
+
+  test('returns no resources for an empty product listing', async (): Promise<void> => {
+    mock.mockImplementation(async (path, method, params, body) => {
+      if (path === '/products' && method === 'GET') {
+        return '';
+      }
+      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
+        return `Details for product ${params.product}`;
+      }
+      return body;
+    });
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/list'
+    });
+    expect(answer.result?.resources).toStrictEqual([]);
+  });
 });
