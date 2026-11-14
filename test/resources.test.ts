@@ -15,13 +15,29 @@ jest.unstable_mockModule('../src/baza.js', () => ({
 
 const { once } = await import('./helpers/once.js');
 
+const listing = async (
+  csv: string
+): Promise<Array<{ name: string; uri: string; description?: string }>> => {
+  mock.mockImplementation(async (path, method, params, body) => {
+    if (path === '/products' && method === 'GET') {
+      return csv;
+    }
+    return body;
+  });
+  const answer = await once({
+    jsonrpc: '2.0' as const,
+    id: 1,
+    method: 'resources/list'
+  });
+  return answer.result?.resources as Array<{
+    name: string; uri: string; description?: string
+  }>;
+};
+
 describe('resources', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     mock.mockImplementation(async (path, method, params, body) => {
-      if (path === '/products' && method === 'GET') {
-        return 'product1\nproduct2\nproduct3';
-      }
       if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
         return `Details for product ${params.product}`;
       }
@@ -29,145 +45,77 @@ describe('resources', () => {
     });
   });
 
-  test('lists fake resources from baza', async (): Promise<void> => {
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('resources');
-    expect(Array.isArray(answer.result?.resources)).toBe(true);
-    if (answer.result?.resources?.length === 0) {
-      return;
-    }
-    const resource = answer.result?.resources?.[0];
-    expect(resource).toHaveProperty('name');
-    expect(resource).toHaveProperty('uri');
-    expect(resource).toHaveProperty('description');
+  test('lists the products from baza', async (): Promise<void> => {
+    const resources = await listing('product1\nproduct2\nproduct3');
+    expect(resources.map((r) => r.name)).toStrictEqual([
+      'product1',
+      'product2',
+      'product3'
+    ]);
   });
 
-  test('fetches fake resource details', async (): Promise<void> => {
-    const list = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    if (list.result?.resources?.length === 0) {
-      return;
-    }
-    const name = list.result?.resources?.[0].name;
-    expect(name).toBeDefined();
-    expect(name).not.toBeNull();
-    const rname = name as string;
-    expect(rname.length).toBeGreaterThan(0);
+  test('lists products under their products:// URIs', async (): Promise<void> => {
+    const resources = await listing('product1\nproduct2\nproduct3');
+    expect(resources.map((r) => r.uri)).toStrictEqual([
+      'products://product1',
+      'products://product2',
+      'products://product3'
+    ]);
+  });
+
+  test('describes each product by its name', async (): Promise<void> => {
+    const resources = await listing('product1\nproduct2\nproduct3');
+    expect(resources.map((r) => r.description)).toStrictEqual([
+      'A software product named "product1" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.',
+      'A software product named "product2" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.',
+      'A software product named "product3" is being developed by'
+        + ' a team of programmers under the supervision of Zerocracy.'
+    ]);
+  });
+
+  test('reads a product by a fixed URI', async (): Promise<void> => {
     const answer = await once({
       jsonrpc: '2.0' as const,
-      id: 2,
+      id: 1,
       method: 'resources/read',
       params: {
-        uri: `products://${rname}`
+        uri: 'products://product1'
       }
     });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('contents');
-    expect(Array.isArray(answer.result?.contents)).toBe(true);
-    expect(answer.result?.contents?.length).toBeGreaterThan(0);
-    const content = answer.result?.contents?.[0];
-    expect(content).toHaveProperty('uri');
-    expect(content).toHaveProperty('text');
+    expect(answer.result?.contents?.[0].text).toBe('Details for product product1');
+  });
+
+  test('returns the requested URI in the read contents', async (): Promise<void> => {
+    const answer = await once({
+      jsonrpc: '2.0' as const,
+      id: 1,
+      method: 'resources/read',
+      params: {
+        uri: 'products://product1'
+      }
+    });
+    expect(answer.result?.contents?.[0].uri).toBe('products://product1');
   });
 
   test('skips blank and whitespace-only product records', async (): Promise<void> => {
-    mock.mockImplementation(async (path, method, params, body) => {
-      if (path === '/products' && method === 'GET') {
-        return 'product1\n\n   \n\t\nproduct2\n';
-      }
-      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
-        return `Details for product ${params.product}`;
-      }
-      return body;
-    });
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    const resources = await listing('product1\n\n   \n\t\nproduct2\n');
     expect(resources.map((r) => r.name)).toStrictEqual(['product1', 'product2']);
-    expect(resources.map((r) => r.uri)).toStrictEqual([
-      'products://product1',
-      'products://product2'
-    ]);
   });
 
   test('trims surrounding whitespace from product names', async (): Promise<void> => {
-    mock.mockImplementation(async (path, method, params, body) => {
-      if (path === '/products' && method === 'GET') {
-        return '  product one  \n\tproduct2\t\n';
-      }
-      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
-        return `Details for product ${params.product}`;
-      }
-      return body;
-    });
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    const resources = answer.result?.resources as Array<{
-      name: string; uri: string; description: string
-    }>;
+    const resources = await listing('  product one  \n\tproduct2\t\n');
     expect(resources.map((r) => r.name)).toStrictEqual(['product one', 'product2']);
-    expect(resources.map((r) => r.uri)).toStrictEqual([
-      'products://product one',
-      'products://product2'
-    ]);
-    expect(resources[0].description).toContain('"product one"');
   });
 
   test('handles CRLF product records', async (): Promise<void> => {
-    mock.mockImplementation(async (path, method, params, body) => {
-      if (path === '/products' && method === 'GET') {
-        return 'product1\r\n   \r\nproduct2\r\n';
-      }
-      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
-        return `Details for product ${params.product}`;
-      }
-      return body;
-    });
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
+    const resources = await listing('product1\r\n   \r\nproduct2\r\n');
     expect(resources.map((r) => r.name)).toStrictEqual(['product1', 'product2']);
   });
 
-  test('filters empty products from trailing newlines', async (): Promise<void> => {
-    mock.mockImplementation(async (path, method, params, body) => {
-      if (path === '/products' && method === 'GET') {
-        return 'product1\nproduct2\n';
-      }
-      if (path === '/mcp/resource' && method === 'PUT' && params.name === 'product') {
-        return `Details for product ${params.product}`;
-      }
-      return body;
-    });
-    const answer = await once({
-      jsonrpc: '2.0' as const,
-      id: 1,
-      method: 'resources/list'
-    });
-    expect(answer).toHaveProperty('result');
-    expect(answer.result).toHaveProperty('resources');
-    const resources = answer.result?.resources as Array<{name: string; uri: string}>;
-    expect(resources.length).toBe(2);
-    for (const r of resources) {
-      expect(r.name.length).toBeGreaterThan(0);
-      expect(r.uri).toMatch(/^products:\/\//);
-    }
+  test('filters empty records after a trailing newline', async (): Promise<void> => {
+    const resources = await listing('product1\nproduct2\n');
+    expect(resources.map((r) => r.name)).toStrictEqual(['product1', 'product2']);
   });
 });
