@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025-2026 Zerocracy
 # SPDX-License-Identifier: MIT
 
-.PHONY: all test lint it tsc clean
+.PHONY: all test lint it tsc perms clean
 .ONESHELL:
 .SHELLFLAGS := -e -o pipefail -c
 .SECONDARY:
 SHELL := bash
 
-all: test lint it tsc
+all: test lint it tsc perms
 
 lint:
 	npx -y eslint . --config eslint.config.mjs
@@ -24,6 +24,10 @@ it:
 
 tsc:
 	npx -y tsc --noEmit --project tsconfig.json
+
+perms:
+	@test -z "$$(grep -L '^permissions:' .github/workflows/*.yml)"
+	@test -z "$$(grep -lE '^(read|write)-all:' .github/workflows/*.yml)"
 
 clean:
 	rm -rf dist temp coverage
