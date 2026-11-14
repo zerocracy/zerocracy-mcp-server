@@ -13,6 +13,14 @@ export type Resource = {
   mimeType?: string;
 };
 
+const decode = (name: string): string => {
+  try {
+    return decodeURIComponent(name);
+  } catch {
+    return name;
+  }
+};
+
 server.resource(
   'product',
   new ResourceTemplate(
@@ -27,7 +35,7 @@ server.resource(
             .map((p) => p.trim())
             .filter((p) => p.length > 0);
           list = products.map((product) => ({
-            uri: `products://${product}`,
+            uri: `products://${encodeURIComponent(product)}`,
             name: product,
             description: to_gpt(
               `
@@ -47,7 +55,7 @@ server.resource(
       uri: uri.href,
       text: await baza(
         '/mcp/resource', 'PUT',
-        { name: 'product', product: String(name) },
+        { name: 'product', product: decode(String(name)) },
         ''
       )
     }]
