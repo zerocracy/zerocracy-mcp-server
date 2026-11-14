@@ -22,6 +22,11 @@ const route = (req: IncomingMessage, res: ServerResponse): void => {
   } else if (path === '/redirect') {
     res.writeHead(303, { 'Location': 'http://localhost/elsewhere' });
     res.end('');
+  } else if (path === '/stalled-headers') {
+    // Keep the connection open without sending response headers.
+  } else if (path === '/stalled-body') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('incomplete body');
   } else {
     res.writeHead(404, { 'X-Zerocracy-Failure': `No page at ${path}` });
     res.end('');
@@ -47,6 +52,7 @@ export class FakeBaza {
     return `http://127.0.0.1:${addr.port}`;
   }
   async close(): Promise<void> {
+    this.http.closeAllConnections();
     await new Promise<void>((resolve): void => {
       this.http.close((): void => resolve());
     });
