@@ -48,6 +48,10 @@ make
 
 If everything builds correctly after your changes, submit a pull request.
 
+The build also packs and installs the production package in a temporary directory,
+then checks that its executable starts from an unrelated directory with an empty
+npm cache and offline npm configuration. Run this check alone with `make package`.
+
 [MCP]: https://modelcontextprotocol.io/
 [Npm]: https://www.npmjs.com/
 [Node]: https://nodejs.org/en
