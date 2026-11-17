@@ -10,11 +10,10 @@ import '../../src/tools.js';
 import '../../src/resources.js';
 import '../../src/prompts.js';
 
-const waitForResponse = async (buffer: ReadBuffer, msec = 5000): Promise<JSONRPCMessage | null> => {
+const waitForResponse = async (buffer: ReadBuffer, msec: number): Promise<JSONRPCMessage> => {
   const start = Date.now();
-  let message: JSONRPCMessage | null = null;
   while (Date.now() - start < msec) {
-    message = buffer.readMessage();
+    const message = buffer.readMessage();
     if (message !== null) {
       return message;
     }
@@ -49,14 +48,8 @@ export const once = async (message: JSONRPCMessage): Promise<ResponseType> => {
       callback();
     }
   });
-  if (server.isConnected()) {
-    await server.close();
-  }
   await server.connect(new StdioServerTransport(stdin, stdout));
   const answer = await waitForResponse(buffer, 10000);
   await server.close();
-  if (answer == null) {
-    throw new Error('No message returned');
-  }
   return answer as ResponseType;
 };
