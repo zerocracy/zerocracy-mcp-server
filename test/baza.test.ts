@@ -35,6 +35,18 @@ describe('baza', () => {
     expect(body).toContain('Disallow');
   });
 
+  test.each<[string, string, Record<string, string>, string, string]>([
+    ['/products', 'GET', {}, '', 'hello-world\nfoo-bar'],
+    ['/mcp/tool', 'PUT', { product: 'hello-world' }, 'Help', 'Advice about hello-world'],
+    ['/mcp/resource', 'PUT', { product: 'hello-world' }, '', 'Details about hello-world']
+  ])(
+    'fetches %s when the host has a trailing slash',
+    async (path, method, params, body, expected) => {
+      process.env.ZEROCRACY_HOST = `${host}/`;
+      await expect(baza(path, method, params, body)).resolves.toBe(expected);
+    }
+  );
+
   test('fetches non-existing page', async () => {
     await expect(
       baza('/this/path/does/not/exist', 'POST', {}, 'boom')
