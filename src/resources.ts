@@ -20,25 +20,23 @@ server.resource(
     {
       list: async (): Promise<{ resources: Resource[] }> => {
         const csv = await baza('/products', 'GET', {}, '');
-        let list: Array<Resource> = [];
-        if (csv.length !== 0) {
-          const products = csv
+        return {
+          resources: csv
             .split("\n")
             .map((p) => p.trim())
-            .filter((p) => p.length > 0);
-          list = products.map((product) => ({
-            uri: `products://${product}`,
-            name: product,
-            description: to_gpt(
-              `
+            .filter((p) => p.length > 0)
+            .map((product) => ({
+              uri: `products://${product}`,
+              name: product,
+              description: to_gpt(
+                `
               A software product named \"${product}\" is being developed by
               a team of programmers under the supervision of Zerocracy.
               `
-            ),
-            mimeType: 'text/plain'
-          }));
-        }
-        return { resources: list };
+              ),
+              mimeType: 'text/plain'
+            }))
+        };
       }
     }
   ),
