@@ -36,6 +36,11 @@ Then, restart [Claude Desktop] and ask it something along these lines:
 If you add the [GitHub MCP server] too,
 you can truly enjoy AI-driven vibe-management.
 
+Requests to Zerocracy, including reading the response body, time out after
+30,000 milliseconds. To change this limit, set `ZEROCRACY_TIMEOUT_MS` in the
+server's environment to an integer from 1 to 2147483647 milliseconds.
+A timed-out request returns a network error; subsequent requests can continue.
+
 ## How to Contribute
 
 To test this project, simply run the following commands (you'll need
