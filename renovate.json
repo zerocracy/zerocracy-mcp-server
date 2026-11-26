@@ -23,6 +23,12 @@
       "matchPackageNames": [
         "@typescript-eslint/{/,}**"
       ]
+    },
+    {
+      "allowedVersions": "<7",
+      "matchPackageNames": [
+        "typescript"
+      ]
     }
   ],
   "platformAutomerge": false,

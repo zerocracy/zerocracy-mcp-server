@@ -3,7 +3,7 @@
 
 import { describe, expect, test } from '@jest/globals';
 import { once } from './helpers/once.js';
-import '../src/prompts';
+import '../src/prompts.js';
 
 describe('prompts', () => {
   test('lists all prompts', async (): Promise<void> => {
