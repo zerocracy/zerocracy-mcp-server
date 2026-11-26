@@ -38,8 +38,8 @@ you can truly enjoy AI-driven vibe-management.
 
 ## How to Contribute
 
-To test this project, simply run the following commands (you'll need
-[Node] 18+, [Npm], and [GNU make] installed):
+To run the development checks, install [Node] 24, [Npm], and [GNU make],
+then run:
 
 ```bash
 npm install
