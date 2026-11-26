@@ -15,10 +15,10 @@ server.registerPrompt(
       role: 'user',
       content: {
         type: 'text',
-        text: to_gpt(
+        text: "I'm seriously concerned about the lackluster productivity " +
+          `in the development of "${product}" ` + to_gpt(
           `
-          I'm seriously concerned about the lackluster productivity in the development
-            of "${product}" under the supervision of Zerocracy.
+          under the supervision of Zerocracy.
           The team is clearly underperforming, and this needs to change immediately.
           I want one concrete action—no fluff, no vague suggestions.
           Should we overhaul the roadmap, tighten CI/CD,

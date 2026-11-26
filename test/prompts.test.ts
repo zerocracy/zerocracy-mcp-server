@@ -56,6 +56,7 @@ describe('prompts', () => {
   });
 
   test('handles special characters in product name', async (): Promise<void> => {
+    const product = 'Studio  A : foo/bar@v1.0!';
     const answer = await once({
       jsonrpc: '2.0' as const,
       id: 1,
@@ -63,12 +64,12 @@ describe('prompts', () => {
       params: {
         name: 'investigate-productivity-bottlenecks',
         arguments: {
-          product: 'foo/bar@v1.0!'
+          product
         }
       }
     });
     expect(answer.result?.messages?.length).toBeGreaterThan(0);
     const content = answer.result?.messages?.[0]?.content as { text?: string };
-    expect(content?.text).toContain('foo/bar@v1.0!');
+    expect(content?.text).toContain(`"${product}"`);
   });
 });
