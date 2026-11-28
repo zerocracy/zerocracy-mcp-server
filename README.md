@@ -21,7 +21,7 @@ of [Claude Desktop] (you can get the token from [Zerocracy]):
       "command": "npx",
       "args": [
         "-y",
-        "zerocracy/zerocracy-mcp-server",
+        "zerocracy/zerocracy-mcp-server"
       ],
       "env": {
         "ZEROCRACY_TOKEN": "<YOUR-ZEROCRACY-TOKEN>"
