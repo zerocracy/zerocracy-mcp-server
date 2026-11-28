@@ -24,13 +24,13 @@ server.registerTool(
     inputSchema: { concern: z.string(), product: z.string() }
   },
   // @ts-ignore TS2589 type depth
-  async ({ concern, product }: { concern: string; product: string }) => {
+  async ({ concern, product }: { concern: string; product: string }, { signal }) => {
     return ({
       content: [{
         text: await baza(
           '/mcp/tool', 'PUT',
           { name: 'advice', product: product },
-          concern
+          concern, signal
         ),
         type: 'text'
       }]

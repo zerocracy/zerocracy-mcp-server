@@ -18,8 +18,8 @@ server.resource(
   new ResourceTemplate(
     'products://{name}',
     {
-      list: async (): Promise<{ resources: Resource[] }> => {
-        const csv = await baza('/products', 'GET', {}, '');
+      list: async ({ signal }): Promise<{ resources: Resource[] }> => {
+        const csv = await baza('/products', 'GET', {}, '', signal);
         let list: Array<Resource> = [];
         if (csv.length !== 0) {
           const products = csv
@@ -42,13 +42,13 @@ server.resource(
       }
     }
   ),
-  async (uri, { name }) => ({
+  async (uri, { name }, { signal }) => ({
     contents: [{
       uri: uri.href,
       text: await baza(
         '/mcp/resource', 'PUT',
         { name: 'product', product: String(name) },
-        ''
+        '', signal
       )
     }]
   })
