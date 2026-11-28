@@ -10,7 +10,7 @@ jest.unstable_mockModule('../src/server', () => ({
     connect: mockConnect,
     registerTool: jest.fn(),
     registerPrompt: jest.fn(),
-    resource: jest.fn(),
+    registerResource: jest.fn(),
   }
 }));
 
