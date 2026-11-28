@@ -3,7 +3,6 @@
 
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { baza } from './baza.js';
-import { to_gpt } from './to_gpt.js';
 import { server } from './server.js';
 
 export type Resource = {
@@ -29,12 +28,8 @@ server.resource(
           list = products.map((product) => ({
             uri: `products://${product}`,
             name: product,
-            description: to_gpt(
-              `
-              A software product named \"${product}\" is being developed by
-              a team of programmers under the supervision of Zerocracy.
-              `
-            ),
+            description: `A software product named "${product}" is being developed by ` +
+              'a team of programmers under the supervision of Zerocracy.',
             mimeType: 'text/plain'
           }));
         }

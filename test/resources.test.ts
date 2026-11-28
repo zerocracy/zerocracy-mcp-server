@@ -74,6 +74,13 @@ describe('resources', () => {
     expect(content).toHaveProperty('text');
   });
 
+  test('names the exact product in each description', async (): Promise<void> => {
+    const product = 'Studio  A : R&D';
+    mock.mockResolvedValueOnce(product);
+    const answer = await once({ jsonrpc: '2.0' as const, id: 1, method: 'resources/list' });
+    expect(answer.result?.resources?.[0]?.description).toContain(`"${product}"`);
+  });
+
   test('skips blank and whitespace-only product records', async (): Promise<void> => {
     mock.mockImplementation(async (path, method, params, body) => {
       if (path === '/products' && method === 'GET') {
